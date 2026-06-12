@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantastic Beasts - Monster Brawl</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="screen active">
+            <div class="auth-container">
+                <h1>🐉 Fantastic Beasts</h1>
+                <h2>Monster Brawl</h2>
+                
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">Sign In</button>
+                    <button class="tab-btn" data-tab="register">Create Account</button>
+                </div>
+                
+                <form id="login-form" class="auth-form active">
+                    <div class="input-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" required placeholder="Enter your username">
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                    <p class="error-msg" id="login-error"></p>
+                </form>
+                
+                <form id="register-form" class="auth-form">
+                    <div class="input-group">
+                        <label for="reg-username">Username</label>
+                        <input type="text" id="reg-username" required placeholder="Choose a username" minlength="3" maxlength="20">
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-displayname">Display Name</label>
+                        <input type="text" id="reg-displayname" required placeholder="How you'll appear" maxlength="30">
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-password">Password</label>
+                        <input type="password" id="reg-password" required placeholder="Create a password" minlength="6">
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-confirm">Confirm Password</label>
+                        <input type="password" id="reg-confirm" required placeholder="Confirm password">
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                    <p class="error-msg" id="register-error"></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Avatar Creator Screen -->
+        <div id="avatar-screen" class="screen">
+            <div class="avatar-container">
+                <h2>Create Your Beast</h2>
+                <p class="subtitle">Customize your monster avatar</p>
+                
+                <div class="avatar-preview">
+                    <canvas id="avatar-canvas" width="200" height="200"></canvas>
+                </div>
+                
+                <div class="avatar-controls">
+                    <div class="control-group">
+                        <label>Body Shape</label>
+                        <div class="btn-row">
+                            <button class="option-btn" data-part="body" data-value="round">Round</button>
+                            <button class="option-btn" data-part="body" data-value="square">Square</button>
+                            <button class="option-btn" data-part="body" data-value="triangle">Triangle</button>
+                            <button class="option-btn" data-part="body" data-value="star">Star</button>
+                            <button class="option-btn" data-part="body" data-value="diamond">Diamond</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Body Color</label>
+                        <div class="color-picker">
+                            <button class="color-btn" data-part="bodyColor" data-value="#FF6B6B" style="background:#FF6B6B"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#4ECDC4" style="background:#4ECDC4"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#45B7D1" style="background:#45B7D1"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#96CEB4" style="background:#96CEB4"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#FFEAA7" style="background:#FFEAA7"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#DDA0DD" style="background:#DDA0DD"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#98D8C8" style="background:#98D8C8"></button>
+                            <button class="color-btn" data-part="bodyColor" data-value="#F7DC6F" style="background:#F7DC6F"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Eyes</label>
+                        <div class="btn-row">
+                            <button class="option-btn" data-part="eyes" data-value="normal">Normal</button>
+                            <button class="option-btn" data-part="eyes" data-value="big">Big</button>
+                            <button class="option-btn" data-part="eyes" data-value="angry">Angry</button>
+                            <button class="option-btn" data-part="eyes" data-value="wink">Wink</button>
+                            <button class="option-btn" data-part="eyes" data-value="cyclops">Cyclops</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Mouth</label>
+                        <div class="btn-row">
+                            <button class="option-btn" data-part="mouth" data-value="smile">Smile</button>
+                            <button class="option-btn" data-part="mouth" data-value="frown">Frown</button>
+                            <button class="option-btn" data-part="mouth" data-value="open">Open</button>
+                            <button class="option-btn" data-part="mouth" data-value="tongue">Tongue</button>
+                            <button class="option-btn" data-part="mouth" data-value="sharp">Sharp</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Accessories</label>
+                        <div class="btn-row">
+                            <button class="option-btn" data-part="accessory" data-value="none">None</button>
+                            <button class="option-btn" data-part="accessory" data-value="glasses">Glasses</button>
+                            <button class="option-btn" data-part="accessory" data-value="hat">Hat</button>
+                            <button class="option-btn" data-part="accessory" data-value="bow">Bow</button>
+                            <button class="option-btn" data-part="accessory" data-value="crown">Crown</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Background</label>
+                        <div class="color-picker">
+                            <button class="color-btn" data-part="bgColor" data-value="#2C3E50" style="background:#2C3E50"></button>
+                            <button class="color-btn" data-part="bgColor" data-value="#8E44AD" style="background:#8E44AD"></button>
+                            <button class="color-btn" data-part="bgColor" data-value="#27AE60" style="background:#27AE60"></button>
+                            <button class="color-btn" data-part="bgColor" data-value="#E74C3C" style="background:#E74C3C"></button>
+                            <button class="color-btn" data-part="bgColor" data-value="#F39C12" style="background:#F39C12"></button>
+                            <button class="color-btn" data-part="bgColor" data-value="#1ABC9C" style="background:#1ABC9C"></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="avatar-actions">
+                    <button id="randomize-btn" class="btn-secondary">Randomize</button>
+                    <button id="save-avatar-btn" class="btn-primary">Save & Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="menu-screen" class="screen">
+            <div class="menu-container">
+                <div class="user-header">
+                    <canvas id="header-avatar" width="60" height="60"></canvas>
+                    <div class="user-info">
+                        <span id="user-display-name">Player</span>
+                        <span id="user-level">Level 1</span>
+                    </div>
+                    <button id="settings-btn" class="icon-btn">⚙️</button>
+                </div>
+                
+                <h1>Fantastic Beasts</h1>
+                <h2>Monster Brawl</h2>
+                
+                <div class="menu-grid">
+                    <button class="menu-btn" data-page="play">
+                        <span class="icon">⚔️</span>
+                        <span class="label">Play</span>
+                    </button>
+                    <button class="menu-btn" data-page="collection">
+                        <span class="icon">🐉</span>
+                        <span class="label">My Beasts</span>
+                    </button>
+                    <button class="menu-btn" data-page="shop">
+                        <span class="icon">🛒</span>
+                        <span class="label">Shop</span>
+                    </button>
+                    <button class="menu-btn" data-page="leaderboard">
+                        <span class="icon">🏆</span>
+                        <span class="label">Leaderboard</span>
+                    </button>
+                    <button class="menu-btn" data-page="settings">
+                        <span class="icon">⚙️</span>
+                        <span class="label">Settings</span>
+                    </button>
+                    <button class="menu-btn" id="logout-btn">
+                        <span class="icon">🚪</span>
+                        <span class="label">Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings-page" class="page">
+            <div class="page-header">
+                <button class="back-btn" data-back="menu">← Back</button>
+                <h2>Settings</h2>
+            </div>
+            
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h3>Account</h3>
+                    <div class="setting-item">
+                        <label>Display Name</label>
+                        <input type="text" id="settings-display-name" maxlength="30">
+                    </div>
+                    <div class="setting-item">
+                        <label>Change Password</label>
+                        <button class="btn-secondary" id="change-password-btn">Change</button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Appearance</h3>
+                    <div class="setting-item">
+                        <label>Theme</label>
+                        <select id="theme-select">
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                            <option value="fantasy">Fantasy</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Animations</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="animations-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Audio</h3>
+                    <div class="setting-item">
+                        <label>Sound Effects</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="sfx-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>Music</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="music-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>Volume</label>
+                        <input type="range" id="volume-slider" min="0" max="100" value="80">
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Game</h3>
+                    <div class="setting-item">
+                        <label>Show Hints</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="hints-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>Difficulty</label>
+                        <select id="difficulty-select">
+                            <option value="easy">Easy</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-section danger">
+                    <h3>Data</h3>
+                    <button class="btn-danger" id="clear-data-btn">Clear All Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Play Page -->
+        <div id="play-page" class="page">
+            <div class="page-header">
+                <button class="back-btn" data-back="menu">← Back</button>
+                <h2>Play</h2>
+            </div>
+            
+            <div class="play-container">
+                <div class="game-modes">
+                    <div class="mode-card" data-mode="brawl">
+                        <h3>Monster Brawl</h3>
+                        <p>Battle against other beasts</p>
+                        <button class="btn-primary">Play</button>
+                    </div>
+                    <div class="mode-card" data-mode="campaign">
+                        <h3>Campaign</h3>
+                        <p>Adventure through the wizarding world</p>
+                        <button class="btn-primary" disabled>Coming Soon</button>
+                    </div>
+                    <div class="mode-card" data-mode="arena">
+                        <h3>Arena</h3>
+                        <p>Survive waves of enemies</p>
+                        <button class="btn-primary" disabled>Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collection Page -->
+        <div id="collection-page" class="page">
+            <div class="page-header">
+                <button class="back-btn" data-back="menu">← Back</button>
+                <h2>My Beasts</h2>
+            </div>
+            
+            <div class="collection-container">
+                <div class="beast-grid" id="beast-grid">
+                    <!-- Beasts will be loaded here -->
+                </div>
+                <button class="btn-primary" id="create-new-beast">+ Create New Beast</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
