@@ -3,829 +3,1092 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monster Brawl</title>
+    <title>Monster Brawl - Arena Survival</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
         body {
+            background: #1a1a2e;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        .game-container {
-            width: 100%;
-            max-width: 900px;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #e94560, 0 0 40px #e94560;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #aaa;
-            margin-bottom: 20px;
-        }
-
-        /* Selection Screen */
-        .selection-screen {
-            text-align: center;
-        }
-
-        .monster-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .monster-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-        }
-
-        .monster-card:hover {
-            transform: scale(1.05);
-            border-color: #ffd700;
-        }
-
-        .monster-card.selected {
-            border-color: #ffd700;
-            background: rgba(255, 215, 0, 0.2);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-        }
-
-        .monster-card .emoji {
-            font-size: 5em;
-        }
-
-        .monster-card .name {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .monster-card .stats {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            font-size: 0.9em;
-            color: #aaa;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .btn-primary {
-            padding: 20px 60px;
-            font-size: 1.5em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #e94560, #c0392b);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        #game-container {
+            position: relative;
         }
 
-        .btn-primary:hover {
-            transform: scale(1.05);
+        canvas {
+            border: 4px solid #e94560;
+            border-radius: 10px;
             box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
         }
 
-        /* Battle Screen */
-        .battle-screen {
-            display: none;
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
 
-        .battle-arena {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 20px 0;
-            border: 3px solid #e94560;
-        }
-
-        .wave-indicator {
-            text-align: center;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            color: #ffd700;
-        }
-
-        .battle-field {
+        .hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            gap: 30px;
-            margin-bottom: 30px;
-            min-height: 220px;
-            position: relative;
-        }
-
-        .fighter {
-            flex: 1;
-            text-align: center;
-            position: relative;
-        }
-
-        .fighter-emoji {
-            font-size: 6em;
-            animation: idle 2s ease infinite;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-        }
-
-        @keyframes idle {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .fighter.attacking {
-            animation: lunge 0.4s ease;
-        }
-
-        .fighter.taking-damage {
-            animation: shake 0.4s ease;
-            filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(5);
-        }
-
-        .fighter.dead {
-            animation: die 0.5s ease forwards;
-        }
-
-        @keyframes lunge {
-            0% { transform: translateX(0) scale(1); }
-            50% { transform: translateX(40px) scale(1.1); }
-            100% { transform: translateX(0) scale(1); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-15px); }
-            75% { transform: translateX(15px); }
-        }
-
-        @keyframes die {
-            to { transform: rotate(90deg) translateY(50px); opacity: 0.5; }
-        }
-
-        .fighter-name {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .hp-bar {
-            width: 100%;
-            max-width: 200px;
-            height: 25px;
-            background: #333;
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 10px auto;
-            border: 2px solid #555;
-        }
-
-        .hp-fill {
-            height: 100%;
-            border-radius: 15px;
-            transition: width 0.3s ease;
-        }
-
-        .hp-fill.player { background: linear-gradient(90deg, #4ecdc4, #44a08d); }
-        .hp-fill.enemy { background: linear-gradient(90deg, #e94560, #c0392b); }
-
-        .hp-text {
-            font-size: 0.9em;
-            color: #aaa;
-        }
-
-        .vs-text {
-            font-size: 3em;
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        /* Action Bar */
-        .action-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .action-btn {
-            padding: 20px 15px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .action-btn.attack {
-            background: linear-gradient(135deg, #e94560, #c0392b);
-            color: white;
-        }
-
-        .action-btn.defend {
-            background: linear-gradient(135deg, #4ecdc4, #44a08d);
-            color: white;
-        }
-
-        .action-btn.special {
-            background: linear-gradient(135deg, #f7b731, #e58e26);
-            color: white;
-        }
-
-        .action-btn.heal {
-            background: linear-gradient(135deg, #96c93d, #00b09b);
-            color: white;
-        }
-
-        .action-btn .cooldown {
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            font-size: 0.7em;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 6px;
-            border-radius: 10px;
-        }
-
-        /* Damage Popup */
-        .damage-popup {
-            position: absolute;
-            font-size: 2.5em;
-            font-weight: bold;
-            animation: damageFloat 1s ease forwards;
             pointer-events: none;
-            z-index: 100;
         }
 
-        .damage-popup.crit {
-            color: #ffd700;
-            font-size: 3em;
+        .hud-left, .hud-right {
+            display: flex;
+            gap: 15px;
         }
 
-        .damage-popup.normal {
-            color: #ff6b6b;
+        .hud-item {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid;
         }
 
-        @keyframes damageFloat {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+        .hud-item.hp { border-color: #e94560; }
+        .hud-item.xp { border-color: #4ecdc4; }
+        .hud-item.level { border-color: #ffd700; }
+        .hud-item.crystals { border-color: #00bfff; }
+        .hud-item.wave { border-color: #ff6b6b; }
+
+        .powerup-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            pointer-events: none;
         }
 
-        /* Combat Log */
-        .combat-log {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 20px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 0.9em;
+        .powerup-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid #ffd700;
         }
 
-        .log-entry {
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .log-entry.damage { color: #ff6b6b; }
-        .log-entry.heal { color: #4ecdc4; }
-        .log-entry.special { color: #f7b731; }
-
-        /* Game Over */
-        .game-over {
-            position: fixed;
+        /* Menus */
+        .menu {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            display: none;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            pointer-events: auto;
+            z-index: 100;
         }
 
-        .game-over.show {
-            display: flex;
+        .menu.hidden { display: none; }
+
+        .menu h1 {
+            color: #e94560;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #e94560;
         }
 
-        .game-over h2 {
-            font-size: 4em;
+        .menu h2 {
+            color: #ffd700;
+            font-size: 28px;
             margin-bottom: 20px;
         }
 
-        .game-over.win h2 { color: #4ecdc4; }
-        .game-over.lose h2 { color: #e94560; }
-
-        /* Energy Bar */
-        .energy-bar {
-            width: 100%;
-            max-width: 150px;
-            height: 10px;
-            background: #333;
-            border-radius: 5px;
-            margin: 10px auto;
-            overflow: hidden;
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            max-width: 800px;
+            margin: 20px;
         }
 
-        .energy-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ffd700, #ffed4e);
-            border-radius: 5px;
-            transition: width 0.3s ease;
+        .powerup-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid transparent;
+            min-width: 120px;
         }
 
-        .energy-text {
-            font-size: 0.8em;
+        .powerup-card:hover {
+            transform: scale(1.05);
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .powerup-card.selected {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        .powerup-card .icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .powerup-card .name {
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .powerup-card .desc {
+            color: #aaa;
+            font-size: 10px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #e94560, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .upgrade-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px;
+        }
+
+        .upgrade-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .upgrade-card:hover {
+            border-color: #4ecdc4;
+            transform: scale(1.05);
+        }
+
+        .upgrade-card .level {
             color: #ffd700;
+            font-size: 12px;
         }
 
-        /* Status Effects */
-        .status-effects {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 5px;
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px;
+            max-width: 700px;
         }
 
-        .status-icon {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8em;
-            animation: pulse 1s ease infinite;
+        .shop-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid transparent;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .shop-item:hover {
+            border-color: #00bfff;
         }
 
-        .status-icon.shield { background: #4ecdc4; }
-        .status-icon.burn { background: #e94560; }
-        .status-icon.poison { background: #96c93d; }
+        .shop-item .price {
+            color: #00bfff;
+            font-weight: bold;
+        }
+
+        .stats-display {
+            color: white;
+            margin: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>👾 MONSTER BRAWL 👾</h1>
-        <p class="subtitle">Choose your fighter and battle!</p>
-
-        <!-- Selection Screen -->
-        <div class="selection-screen" id="selection-screen">
-            <h2>Select Your Monster</h2>
-            <div class="monster-grid">
-                <div class="monster-card" data-monster="dragon">
-                    <div class="emoji">🐉</div>
-                    <div class="name">Dragon</div>
-                    <div class="stats">
-                        <span>❤️ 90</span>
-                        <span>⚔️ 30</span>
-                        <span>🛡️ 12</span>
-                    </div>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="900" height="600"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="hud" id="hud">
+                <div class="hud-left">
+                    <div class="hud-item hp">❤️ <span id="hp">100</span></div>
+                    <div class="hud-item xp">⭐ Level <span id="level">1</span></div>
                 </div>
-                <div class="monster-card" data-monster="golem">
-                    <div class="emoji">🗿</div>
-                    <div class="name">Golem</div>
-                    <div class="stats">
-                        <span>❤️ 120</span>
-                        <span>⚔️ 20</span>
-                        <span>🛡️ 20</span>
-                    </div>
-                </div>
-                <div class="monster-card" data-monster="unicorn">
-                    <div class="emoji">🦄</div>
-                    <div class="name">Unicorn</div>
-                    <div class="stats">
-                        <span>❤️ 100</span>
-                        <span>⚔️ 22</span>
-                        <span>🛡️ 15</span>
-                    </div>
-                </div>
-                <div class="monster-card" data-monster="ghost">
-                    <div class="emoji">👻</div>
-                    <div class="name">Ghost</div>
-                    <div class="stats">
-                        <span>❤️ 85</span>
-                        <span>⚔️ 25</span>
-                        <span>🛡️ 8</span>
-                    </div>
+                <div class="hud-right">
+                    <div class="hud-item crystals">💎 <span id="crystals">0</span></div>
+                    <div class="hud-item wave">Wave <span id="wave">1</span>/30</div>
                 </div>
             </div>
-            <button class="btn-primary" onclick="startGame()">BATTLE!</button>
+            <div class="powerup-bar" id="powerupBar"></div>
         </div>
 
-        <!-- Battle Screen -->
-        <div class="battle-screen" id="battle-screen">
-            <div class="wave-indicator">Wave <span id="wave">1</span> / 5</div>
-            
-            <div class="battle-arena">
-                <div class="battle-field" id="battle-field">
-                    <div class="fighter" id="player-fighter">
-                        <div class="fighter-emoji" id="player-emoji">🐉</div>
-                        <div class="fighter-name" id="player-name">Dragon</div>
-                        <div class="hp-bar">
-                            <div class="hp-fill player" id="player-hp" style="width: 100%;"></div>
-                        </div>
-                        <div class="hp-text"><span id="player-hp-text">90</span> / 90</div>
-                        <div class="energy-bar">
-                            <div class="energy-fill" id="player-energy" style="width: 0%;"></div>
-                        </div>
-                        <div class="energy-text">Energy: <span id="player-energy-text">0</span>/100</div>
-                        <div class="status-effects" id="player-status"></div>
-                    </div>
+        <!-- Start Menu -->
+        <div class="menu" id="startMenu">
+            <h1>👾 MONSTER BRAWL</h1>
+            <p style="color: #aaa; margin-bottom: 20px;">Survive 30 waves. Collect crystals. Buy powerups.</p>
+            <button class="btn" onclick="showPowerupSelect()">START GAME</button>
+        </div>
 
-                    <div class="vs-text">VS</div>
+        <!-- Powerup Selection -->
+        <div class="menu hidden" id="powerupMenu">
+            <h2>Choose Your Starting Powerup</h2>
+            <div class="menu-grid" id="powerupGrid"></div>
+            <button class="btn" onclick="confirmPowerup()" id="confirmBtn" style="display:none;">CONFIRM</button>
+        </div>
 
-                    <div class="fighter" id="enemy-fighter">
-                        <div class="fighter-emoji" id="enemy-emoji">👹</div>
-                        <div class="fighter-name" id="enemy-name">Orc</div>
-                        <div class="hp-bar">
-                            <div class="hp-fill enemy" id="enemy-hp" style="width: 100%;"></div>
-                        </div>
-                        <div class="hp-text"><span id="enemy-hp-text">80</span> / 80</div>
-                        <div class="energy-bar">
-                            <div class="energy-fill" id="enemy-energy" style="width: 0%;"></div>
-                        </div>
-                        <div class="energy-text">Energy: <span id="enemy-energy-text">0</span>/100</div>
-                        <div class="status-effects" id="enemy-status"></div>
-                    </div>
-                </div>
+        <!-- Upgrade Menu -->
+        <div class="menu hidden" id="upgradeMenu">
+            <h2>Upgrade Your Powerups</h2>
+            <p style="color: #aaa;">Wave complete! Choose an upgrade.</p>
+            <div class="upgrade-grid" id="upgradeGrid"></div>
+            <button class="btn btn-secondary" onclick="skipUpgrade()">SKIP</button>
+        </div>
 
-                <div class="action-bar">
-                    <button class="action-btn attack" onclick="playerAction('attack')">
-                        ⚔️ ATTACK
-                    </button>
-                    <button class="action-btn defend" onclick="playerAction('defend')">
-                        🛡️ DEFEND
-                    </button>
-                    <button class="action-btn special" onclick="playerAction('special')" id="special-btn">
-                        ✨ SPECIAL
-                        <span class="cooldown">100⚡</span>
-                    </button>
-                    <button class="action-btn heal" onclick="playerAction('heal')">
-                        💚 HEAL
-                        <span class="cooldown">3 left</span>
-                    </button>
-                </div>
-            </div>
+        <!-- New Powerup Menu (every 5 waves) -->
+        <div class="menu hidden" id="newPowerupMenu">
+            <h2>🎉 New Powerup Unlocked!</h2>
+            <p style="color: #aaa;">Every 5 waves you get a new powerup!</p>
+            <div class="menu-grid" id="newPowerupGrid"></div>
+        </div>
 
-            <div class="combat-log" id="combat-log">
-                <div class="log-entry">Battle started! Choose your action!</div>
-            </div>
+        <!-- Shop Menu -->
+        <div class="menu hidden" id="shopMenu">
+            <h2>💎 Crystal Shop</h2>
+            <p style="color: #aaa;">Spend crystals to buy upgrades!</p>
+            <div class="stats-display">Available: <span id="shopCrystals">0</span> 💎</div>
+            <div class="shop-grid" id="shopGrid"></div>
+            <button class="btn btn-secondary" onclick="closeShop()">BACK TO GAME</button>
         </div>
 
         <!-- Game Over -->
-        <div class="game-over" id="game-over">
-            <h2 id="result-title">VICTORY!</h2>
-            <p id="result-stats"></p>
-            <button class="btn-primary" onclick="resetGame()">PLAY AGAIN</button>
+        <div class="menu hidden" id="gameOverMenu">
+            <h1 id="gameOverTitle">GAME OVER</h1>
+            <p style="color: white; font-size: 20px; margin: 20px;">
+                Waves Survived: <span id="finalWave">0</span><br>
+                Crystals Collected: <span id="finalCrystals">0</span>
+            </p>
+            <button class="btn" onclick="resetGame()">PLAY AGAIN</button>
         </div>
     </div>
 
     <script>
-        const MONSTERS = {
-            dragon: { name: 'Dragon', emoji: '🐉', hp: 90, atk: 30, def: 12, special: 'Fire Breath' },
-            golem: { name: 'Golem', emoji: '🗿', hp: 120, atk: 20, def: 20, special: 'Earthquake' },
-            unicorn: { name: 'Unicorn', emoji: '🦄', hp: 100, atk: 22, def: 15, special: 'Rainbow Blast' },
-            ghost: { name: 'Ghost', emoji: '👻', hp: 85, atk: 25, def: 8, special: 'Phantom Strike' }
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
+        let game = {
+            running: false,
+            paused: false,
+            wave: 1,
+            crystals: 0,
+            level: 1,
+            xp: 0,
+            xpToNext: 100,
+            powerups: [],
+            monsters: [],
+            crystals_drops: [],
+            projectiles: [],
+            particles: [],
+            keys: {},
+            mouse: { x: 0, y: 0 },
+            camera: { x: 0, y: 0 }
         };
 
-        const ENEMIES = [
-            { name: 'Orc Warrior', emoji: '👹', hp: 80, atk: 20, def: 8 },
-            { name: 'Dark Knight', emoji: '⚔️', hp: 100, atk: 22, def: 15 },
-            { name: 'Shadow Beast', emoji: '🐺', hp: 70, atk: 28, def: 6 },
-            { name: 'Ice Golem', emoji: '🧊', hp: 110, atk: 18, def: 18 },
-            { name: 'Demon Lord', emoji: '👿', hp: 150, atk: 35, def: 20 }
+        // Player
+        let player = {
+            x: 450,
+            y: 300,
+            radius: 15,
+            speed: 3,
+            hp: 100,
+            maxHp: 100,
+            attackCooldown: 0,
+            facing: { x: 1, y: 0 }
+        };
+
+        // Arena bounds
+        const ARENA = {
+            x: 50,
+            y: 50,
+            width: 800,
+            height: 500
+        };
+
+        // Powerup definitions (30 total)
+        const POWERUPS = [
+            { id: 'sword', icon: '⚔️', name: 'Sword', desc: 'Melee damage +50%', type: 'passive', effect: { damage: 1.5 } },
+            { id: 'shield', icon: '🛡️', name: 'Shield', desc: 'Damage taken -30%', type: 'passive', effect: { defense: 0.7 } },
+            { id: 'boots', icon: '👢', name: 'Speed Boots', desc: 'Move speed +25%', type: 'passive', effect: { speed: 1.25 } },
+            { id: 'heart', icon: '❤️', name: 'Vitality', desc: 'Max HP +50', type: 'passive', effect: { hp: 50 } },
+            { id: 'fire', icon: '🔥', name: 'Fire Orb', desc: 'Ranged fire attack', type: 'active', damage: 25, cooldown: 60 },
+            { id: 'ice', icon: '❄️', name: 'Ice Shard', desc: 'Slows enemies', type: 'active', damage: 15, slow: 0.5, cooldown: 45 },
+            { id: 'lightning', icon: '⚡', name: 'Lightning', desc: 'Chain damage', type: 'active', damage: 35, chain: 3, cooldown: 90 },
+            { id: 'poison', icon: '☠️', name: 'Poison Dart', desc: 'Damage over time', type: 'active', damage: 10, dot: 5, duration: 60, cooldown: 40 },
+            { id: 'heal', icon: '💚', name: 'Heal Aura', desc: 'Passive HP regen', type: 'passive', effect: { regen: 1 } },
+            { id: 'vamp', icon: '🩸', name: 'Vampirism', desc: 'Life steal 20%', type: 'passive', effect: { lifesteal: 0.2 } },
+            { id: 'crit', icon: '🎯', name: 'Critical Eye', desc: '25% crit chance', type: 'passive', effect: { crit: 0.25, critMult: 2 } },
+            { id: 'multishot', icon: '🔫', name: 'Multishot', desc: '3 projectiles', type: 'passive', effect: { multishot: 3 } },
+            { id: 'pierce', icon: '➡️', name: 'Pierce', desc: 'Projectiles pierce', type: 'passive', effect: { pierce: true } },
+            { id: 'explosive', icon: '💥', name: 'Explosive', desc: 'AOE on hit', type: 'passive', effect: { explode: 30 } },
+            { id: 'homing', icon: '🧲', name: 'Homing', desc: 'Projectiles track', type: 'passive', effect: { homing: true } },
+            { id: 'aura', icon: '🔆', name: 'Damage Aura', desc: 'Damage nearby', type: 'passive', effect: { aura: 10, auraRange: 60 } },
+            { id: 'clone', icon: '👥', name: 'Clone', desc: 'Summon helper', type: 'active', cooldown: 300 },
+            { id: 'dash', icon: '💨', name: 'Dash', desc: 'Quick movement', type: 'active', cooldown: 60 },
+            { id: 'shield2', icon: '🛡️', name: 'Bubble Shield', desc: 'Temporary invincibility', type: 'active', duration: 120, cooldown: 300 },
+            { id: 'bomb', icon: '💣', name: 'Bomb', desc: 'Big AOE damage', type: 'active', damage: 100, cooldown: 180 },
+            { id: 'laser', icon: '🔴', name: 'Laser Beam', desc: 'Piercing beam', type: 'active', damage: 50, cooldown: 120 },
+            { id: 'spin', icon: '🌪️', name: 'Spin Attack', desc: '360 damage', type: 'active', damage: 40, cooldown: 90 },
+            { id: 'magnet', icon: '🧲', name: 'Crystal Magnet', desc: 'Auto collect crystals', type: 'passive', effect: { magnet: 100 } },
+            { id: 'lucky', icon: '🍀', name: 'Lucky', desc: 'More crystals', type: 'passive', effect: { crystalMult: 1.5 } },
+            { id: 'berserk', icon: '😤', name: 'Berserk', desc: 'Low HP = more damage', type: 'passive', effect: { berserk: true } },
+            { id: 'thorn', icon: '🌵', name: 'Thorns', desc: 'Reflect damage', type: 'passive', effect: { thorn: 0.3 } },
+            { id: 'freeze', icon: '🥶', name: 'Freeze', desc: 'Freeze all enemies', type: 'active', duration: 180, cooldown: 360 },
+            { id: 'meteor', icon: '☄️', name: 'Meteor', desc: 'Rain destruction', type: 'active', damage: 80, cooldown: 240 },
+            { id: 'drain', icon: '🌀', name: 'Life Drain', desc: 'AOE life steal', type: 'active', damage: 20, heal: 20, cooldown: 150 },
+            { id: 'time', icon: '⏱️', name: 'Time Warp', desc: 'Slow time', type: 'active', duration: 300, cooldown: 400 }
         ];
 
-        let gameState = {
-            player: null,
-            enemy: null,
-            wave: 1,
-            playerEnergy: 0,
-            enemyEnergy: 0,
-            healsLeft: 3,
-            defending: false,
-            turn: 'player'
-        };
+        // Monster types
+        const MONSTER_TYPES = [
+            { emoji: '👹', hp: 30, speed: 1.5, damage: 10, xp: 10, crystals: 5 },
+            { emoji: '👺', hp: 50, speed: 2, damage: 15, xp: 15, crystals: 8 },
+            { emoji: '👻', hp: 25, speed: 2.5, damage: 8, xp: 12, crystals: 6 },
+            { emoji: '🧟', hp: 60, speed: 1, damage: 20, xp: 20, crystals: 10 },
+            { emoji: '🦇', hp: 20, speed: 3, damage: 12, xp: 15, crystals: 7 },
+            { emoji: '🐺', hp: 40, speed: 2.2, damage: 18, xp: 18, crystals: 9 },
+            { emoji: '💀', hp: 35, speed: 1.8, damage: 14, xp: 16, crystals: 8 },
+            { emoji: '👿', hp: 80, speed: 1.5, damage: 25, xp: 30, crystals: 15 },
+            { emoji: '🐉', hp: 100, speed: 2, damage: 30, xp: 50, crystals: 25 },
+            { emoji: '👾', hp: 150, speed: 1, damage: 40, xp: 80, crystals: 40 }
+        ];
 
-        let selectedMonster = null;
-
-        // Selection
-        document.querySelectorAll('.monster-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.monster-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                selectedMonster = card.dataset.monster;
-            });
+        // Input handling
+        document.addEventListener('keydown', e => game.keys[e.key] = true);
+        document.addEventListener('keyup', e => game.keys[e.key] = false);
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            game.mouse.x = e.clientX - rect.left;
+            game.mouse.y = e.clientY - rect.top;
+        });
+        canvas.addEventListener('click', () => {
+            if (game.running && !game.paused) playerAttack();
         });
 
-        function startGame() {
-            if (!selectedMonster) {
-                alert('Select a monster!');
-                return;
-            }
-
-            const template = MONSTERS[selectedMonster];
-            gameState.player = {
-                ...template,
-                currentHp: template.hp,
-                maxHp: template.hp,
-                energy: 0
-            };
-
-            spawnEnemy();
+        // Show powerup selection
+        function showPowerupSelect() {
+            document.getElementById('startMenu').classList.add('hidden');
+            document.getElementById('powerupMenu').classList.remove('hidden');
             
-            document.getElementById('selection-screen').style.display = 'none';
-            document.getElementById('battle-screen').style.display = 'block';
+            const grid = document.getElementById('powerupGrid');
+            grid.innerHTML = '';
             
-            updateUI();
-            log('Battle begins! Defeat 5 waves of monsters!', 'special');
-        }
-
-        function spawnEnemy() {
-            const template = ENEMIES[Math.min(gameState.wave - 1, ENEMIES.length - 1)];
-            gameState.enemy = {
-                ...template,
-                currentHp: template.hp,
-                maxHp: template.hp,
-                energy: 0
-            };
-            document.getElementById('wave').textContent = gameState.wave;
-        }
-
-        function playerAction(action) {
-            if (gameState.turn !== 'player') return;
-
-            gameState.defending = false;
-
-            switch(action) {
-                case 'attack':
-                    const damage = calculateDamage(gameState.player.atk, gameState.enemy.def);
-                    dealDamage(damage, 'player', 'enemy');
-                    gameState.player.energy += 25;
-                    break;
-
-                case 'defend':
-                    gameState.defending = true;
-                    gameState.player.energy += 15;
-                    log('You take a defensive stance!', 'heal');
-                    break;
-
-                case 'special':
-                    if (gameState.player.energy >= 100) {
-                        const specialDmg = Math.floor(gameState.player.atk * 2.5);
-                        dealDamage(specialDmg, 'player', 'enemy', true);
-                        gameState.player.energy = 0;
-                        log(`${gameState.player.name} uses ${gameState.player.special}!`, 'special');
-                    } else {
-                        log('Not enough energy!', 'damage');
-                        return;
-                    }
-                    break;
-
-                case 'heal':
-                    if (gameState.healsLeft > 0) {
-                        const heal = Math.floor(gameState.player.maxHp * 0.4);
-                        gameState.player.currentHp = Math.min(gameState.player.maxHp, gameState.player.currentHp + heal);
-                        gameState.healsLeft--;
-                        log(`Healed for ${heal} HP!`, 'heal');
-                        updateUI();
-                    } else {
-                        log('No heals remaining!', 'damage');
-                        return;
-                    }
-                    break;
-            }
-
-            updateUI();
-
-            if (gameState.enemy.currentHp <= 0) {
-                setTimeout(() => nextWave(), 1000);
-            } else {
-                gameState.turn = 'enemy';
-                disableActions(true);
-                setTimeout(() => enemyTurn(), 1000);
-            }
-        }
-
-        function enemyTurn() {
-            const actions = ['attack', 'attack', 'defend', 'special'];
-            const action = actions[Math.floor(Math.random() * actions.length)];
-
-            switch(action) {
-                case 'attack':
-                    let damage = calculateDamage(gameState.enemy.atk, gameState.player.def);
-                    if (gameState.defending) {
-                        damage = Math.floor(damage / 2);
-                        log(`You blocked! Took ${damage} damage!`, 'damage');
-                    }
-                    dealDamage(damage, 'enemy', 'player');
-                    gameState.enemy.energy += 25;
-                    break;
-
-                case 'defend':
-                    log(`${gameState.enemy.name} is defending!`, 'heal');
-                    gameState.enemy.energy += 15;
-                    break;
-
-                case 'special':
-                    if (gameState.enemy.energy >= 100) {
-                        const specialDmg = Math.floor(gameState.enemy.atk * 2);
-                        dealDamage(specialDmg, 'enemy', 'player', true);
-                        gameState.enemy.energy = 0;
-                        log(`${gameState.enemy.name} uses a powerful attack!`, 'special');
-                    } else {
-                        // Fall back to attack
-                        let damage = calculateDamage(gameState.enemy.atk, gameState.player.def);
-                        dealDamage(damage, 'enemy', 'player');
-                        gameState.enemy.energy += 25;
-                    }
-                    break;
-            }
-
-            updateUI();
-
-            if (gameState.player.currentHp <= 0) {
-                setTimeout(() => gameOver(false), 1000);
-            } else {
-                gameState.turn = 'player';
-                disableActions(false);
-            }
-        }
-
-        function calculateDamage(atk, def) {
-            const base = atk - Math.floor(def / 2);
-            const variance = Math.floor(Math.random() * 5) - 2;
-            return Math.max(5, base + variance);
-        }
-
-        function dealDamage(amount, from, to, isCrit = false) {
-            const target = from === 'player' ? gameState.enemy : gameState.player;
-            target.currentHp -= amount;
-
-            // Animate
-            const fromEl = document.getElementById(from + '-fighter');
-            const toEl = document.getElementById(to + '-fighter');
+            // Show 15 random powerups
+            const shuffled = [...POWERUPS].sort(() => Math.random() - 0.5).slice(0, 15);
             
-            fromEl.classList.add('attacking');
-            setTimeout(() => fromEl.classList.remove('attacking'), 400);
-            
-            setTimeout(() => {
-                toEl.classList.add('taking-damage');
-                showDamage(amount, to, isCrit);
-                setTimeout(() => toEl.classList.remove('taking-damage'), 400);
-            }, 200);
-
-            if (from === 'player') {
-                log(`You dealt ${amount} damage!`, 'damage');
-            } else {
-                log(`${gameState.enemy.name} dealt ${amount} damage!`, 'damage');
-            }
-        }
-
-        function showDamage(amount, target, isCrit) {
-            const popup = document.createElement('div');
-            popup.className = 'damage-popup ' + (isCrit ? 'crit' : 'normal');
-            popup.textContent = (isCrit ? 'CRIT! ' : '') + amount;
-            popup.style.left = target === 'enemy' ? '30%' : '70%';
-            popup.style.top = '20%';
-            document.getElementById('battle-field').appendChild(popup);
-            setTimeout(() => popup.remove(), 1000);
-        }
-
-        function nextWave() {
-            gameState.wave++;
-            gameState.healsLeft = 3;
-            gameState.player.energy = 0;
-            
-            if (gameState.wave > 5) {
-                gameOver(true);
-                return;
-            }
-
-            log(`Wave ${gameState.wave - 1} complete!`, 'special');
-            setTimeout(() => {
-                spawnEnemy();
-                gameState.player.currentHp = Math.min(gameState.player.maxHp, gameState.player.currentHp + 30);
-                log(`Wave ${gameState.wave} begins! A ${gameState.enemy.name} appears!`, 'special');
-                updateUI();
-                gameState.turn = 'player';
-                disableActions(false);
-            }, 1500);
-        }
-
-        function updateUI() {
-            // Player
-            document.getElementById('player-emoji').textContent = gameState.player.emoji;
-            document.getElementById('player-name').textContent = gameState.player.name;
-            document.getElementById('player-hp-text').textContent = Math.max(0, gameState.player.currentHp);
-            document.getElementById('player-hp').style.width = (gameState.player.currentHp / gameState.player.maxHp * 100) + '%';
-            document.getElementById('player-energy-text').textContent = Math.min(100, gameState.player.energy);
-            document.getElementById('player-energy').style.width = Math.min(100, gameState.player.energy) + '%';
-
-            // Enemy
-            document.getElementById('enemy-emoji').textContent = gameState.enemy.emoji;
-            document.getElementById('enemy-name').textContent = gameState.enemy.name;
-            document.getElementById('enemy-hp-text').textContent = Math.max(0, gameState.enemy.currentHp);
-            document.getElementById('enemy-hp').style.width = (gameState.enemy.currentHp / gameState.enemy.maxHp * 100) + '%';
-            document.getElementById('enemy-energy-text').textContent = Math.min(100, gameState.enemy.energy);
-            document.getElementById('enemy-energy').style.width = Math.min(100, gameState.enemy.energy) + '%';
-
-            // Special button
-            const specialBtn = document.getElementById('special-btn');
-            if (gameState.player.energy >= 100) {
-                specialBtn.style.opacity = '1';
-                specialBtn.querySelector('.cooldown').textContent = 'READY!';
-            } else {
-                specialBtn.style.opacity = '0.7';
-                specialBtn.querySelector('.cooldown').textContent = (100 - gameState.player.energy) + '⚡';
-            }
-        }
-
-        function disableActions(disabled) {
-            document.querySelectorAll('.action-btn').forEach(btn => {
-                btn.disabled = disabled;
+            shuffled.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'powerup-card';
+                card.innerHTML = `
+                    <div class="icon">${p.icon}</div>
+                    <div class="name">${p.name}</div>
+                    <div class="desc">${p.desc}</div>
+                `;
+                card.onclick = () => selectStartingPowerup(p, card);
+                grid.appendChild(card);
             });
         }
 
-        function log(message, type = '') {
-            const logPanel = document.getElementById('combat-log');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry ' + type;
-            entry.textContent = '> ' + message;
-            logPanel.appendChild(entry);
-            logPanel.scrollTop = logPanel.scrollHeight;
+        let selectedStartPowerup = null;
+        function selectStartingPowerup(p, card) {
+            document.querySelectorAll('.powerup-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedStartPowerup = { ...p, level: 1 };
+            document.getElementById('confirmBtn').style.display = 'block';
         }
 
-        function gameOver(won) {
-            const screen = document.getElementById('game-over');
-            screen.classList.add('show');
-            screen.className = 'game-over show ' + (won ? 'win' : 'lose');
-            document.getElementById('result-title').textContent = won ? '🎉 VICTORY! 🎉' : '💀 DEFEAT 💀';
-            document.getElementById('result-stats').textContent = won ? `You survived all 5 waves!` : `You fell on wave ${gameState.wave}`;
+        function confirmPowerup() {
+            if (!selectedStartPowerup) return;
+            game.powerups = [selectedStartPowerup];
+            applyPowerupEffects();
+            document.getElementById('powerupMenu').classList.add('hidden');
+            startGame();
+        }
+
+        function applyPowerupEffects() {
+            // Reset player stats
+            player.maxHp = 100;
+            player.speed = 3;
+            
+            game.powerups.forEach(p => {
+                if (p.effect) {
+                    if (p.effect.hp) player.maxHp += p.effect.hp * p.level;
+                    if (p.effect.speed) player.speed *= Math.pow(p.effect.speed, p.level);
+                }
+            });
+            
+            player.hp = player.maxHp;
+            updateHUD();
+            updatePowerupBar();
+        }
+
+        function updatePowerupBar() {
+            const bar = document.getElementById('powerupBar');
+            bar.innerHTML = '';
+            game.powerups.forEach(p => {
+                const icon = document.createElement('div');
+                icon.className = 'powerup-icon';
+                icon.innerHTML = p.icon;
+                bar.appendChild(icon);
+            });
+        }
+
+        function startGame() {
+            game.running = true;
+            game.wave = 1;
+            game.crystals = 0;
+            game.level = 1;
+            game.xp = 0;
+            game.monsters = [];
+            game.crystals_drops = [];
+            game.projectiles = [];
+            game.particles = [];
+            
+            player.x = 450;
+            player.y = 300;
+            player.hp = player.maxHp;
+            
+            updateHUD();
+            gameLoop();
+            spawnWave();
+        }
+
+        function spawnWave() {
+            const count = 5 + game.wave * 2;
+            const types = Math.min(MONSTER_TYPES.length, Math.floor(game.wave / 3) + 1);
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    if (!game.running) return;
+                    
+                    const typeIdx = Math.floor(Math.random() * types);
+                    const type = MONSTER_TYPES[typeIdx];
+                    
+                    // Spawn at random edge
+                    let x, y;
+                    if (Math.random() < 0.5) {
+                        x = Math.random() < 0.5 ? ARENA.x - 30 : ARENA.x + ARENA.width + 30;
+                        y = ARENA.y + Math.random() * ARENA.height;
+                    } else {
+                        x = ARENA.x + Math.random() * ARENA.width;
+                        y = Math.random() < 0.5 ? ARENA.y - 30 : ARENA.y + ARENA.height + 30;
+                    }
+                    
+                    game.monsters.push({
+                        x, y,
+                        emoji: type.emoji,
+                        hp: type.hp * (1 + game.wave * 0.1),
+                        maxHp: type.hp * (1 + game.wave * 0.1),
+                        speed: type.speed,
+                        damage: type.damage * (1 + game.wave * 0.05),
+                        xp: type.xp,
+                        crystals: type.crystals,
+                        attackCooldown: 0,
+                        frozen: 0,
+                        poisoned: 0
+                    });
+                }, i * 500);
+            }
+        }
+
+        function playerAttack() {
+            if (player.attackCooldown > 0) return;
+            
+            // Calculate damage
+            let damage = 20;
+            let hasMultishot = false;
+            let multishotCount = 1;
+            
+            game.powerups.forEach(p => {
+                if (p.id === 'sword') damage *= p.effect.damage;
+                if (p.id === 'multishot') {
+                    hasMultishot = true;
+                    multishotCount = p.effect.multishot;
+                }
+            });
+            
+            // Create projectile(s)
+            const angle = Math.atan2(game.mouse.y - player.y, game.mouse.x - player.x);
+            
+            for (let i = 0; i < multishotCount; i++) {
+                let spreadAngle = angle;
+                if (multishotCount > 1) {
+                    spreadAngle = angle + (i - multishotCount/2) * 0.3;
+                }
+                
+                game.projectiles.push({
+                    x: player.x,
+                    y: player.y,
+                    vx: Math.cos(spreadAngle) * 8,
+                    vy: Math.sin(spreadAngle) * 8,
+                    damage: damage,
+                    emoji: hasMultishot ? '🔹' : '⚡',
+                    pierce: game.powerups.some(p => p.id === 'pierce'),
+                    homing: game.powerups.some(p => p.id === 'homing'),
+                    explode: game.powerups.find(p => p.id === 'explosive')?.effect?.explode || 0
+                });
+            }
+            
+            player.attackCooldown = 20;
+        }
+
+        function update() {
+            if (!game.running || game.paused) return;
+            
+            // Player movement
+            let dx = 0, dy = 0;
+            if (game.keys['w'] || game.keys['W'] || game.keys['ArrowUp']) dy = -1;
+            if (game.keys['s'] || game.keys['S'] || game.keys['ArrowDown']) dy = 1;
+            if (game.keys['a'] || game.keys['A'] || game.keys['ArrowLeft']) dx = -1;
+            if (game.keys['d'] || game.keys['D'] || game.keys['ArrowRight']) dx = 1;
+            
+            if (dx !== 0 || dy !== 0) {
+                const len = Math.sqrt(dx*dx + dy*dy);
+                player.x += (dx/len) * player.speed;
+                player.y += (dy/len) * player.speed;
+                
+                // Keep in arena
+                player.x = Math.max(ARENA.x + player.radius, Math.min(ARENA.x + ARENA.width - player.radius, player.x));
+                player.y = Math.max(ARENA.y + player.radius, Math.min(ARENA.y + ARENA.height - player.radius, player.y));
+            }
+            
+            // Update facing
+            player.facing.x = game.mouse.x - player.x;
+            player.facing.y = game.mouse.y - player.y;
+            
+            // Cooldowns
+            if (player.attackCooldown > 0) player.attackCooldown--;
+            
+            // Passive regen
+            const healPower = game.powerups.find(p => p.id === 'heal');
+            if (healPower && player.hp < player.maxHp) {
+                player.hp += healPower.effect.regen * healPower.level * 0.1;
+                player.hp = Math.min(player.hp, player.maxHp);
+            }
+            
+            // Damage aura
+            const aura = game.powerups.find(p => p.id === 'aura');
+            if (aura && Math.random() < 0.1) {
+                game.monsters.forEach(m => {
+                    const dist = Math.hypot(m.x - player.x, m.y - player.y);
+                    if (dist < aura.effect.auraRange) {
+                        m.hp -= aura.effect.aura * aura.level;
+                    }
+                });
+            }
+            
+            // Update projectiles
+            game.projectiles.forEach((p, i) => {
+                // Homing
+                if (p.homing && game.monsters.length > 0) {
+                    let closest = null;
+                    let closestDist = Infinity;
+                    game.monsters.forEach(m => {
+                        const dist = Math.hypot(m.x - p.x, m.y - p.y);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closest = m;
+                        }
+                    });
+                    if (closest) {
+                        const angle = Math.atan2(closest.y - p.y, closest.x - p.x);
+                        p.vx += Math.cos(angle) * 0.5;
+                        p.vy += Math.sin(angle) * 0.5;
+                        const speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+                        p.vx = (p.vx/speed) * 8;
+                        p.vy = (p.vy/speed) * 8;
+                    }
+                }
+                
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Check collisions with monsters
+                let hit = false;
+                game.monsters.forEach(m => {
+                    if (hit && !p.pierce) return;
+                    const dist = Math.hypot(m.x - p.x, m.y - p.y);
+                    if (dist < 25) {
+                        hit = true;
+                        let dmg = p.damage;
+                        
+                        // Crit
+                        const crit = game.powerups.find(cp => cp.id === 'crit');
+                        if (crit && Math.random() < crit.effect.crit) {
+                            dmg *= crit.effect.critMult;
+                        }
+                        
+                        // Berserk
+                        const berserk = game.powerups.find(bp => bp.id === 'berserk');
+                        if (berserk && player.hp < player.maxHp * 0.3) {
+                            dmg *= 1.5;
+                        }
+                        
+                        m.hp -= dmg;
+                        
+                        // Lifesteal
+                        const vamp = game.powerups.find(vp => vp.id === 'vamp');
+                        if (vamp) {
+                            player.hp = Math.min(player.maxHp, player.hp + dmg * vamp.effect.lifesteal);
+                        }
+                        
+                        // Explosive
+                        if (p.explode) {
+                            game.monsters.forEach(nm => {
+                                if (Math.hypot(nm.x - m.x, nm.y - m.y) < p.explode) {
+                                    nm.hp -= p.damage * 0.5;
+                                }
+                            });
+                        }
+                        
+                        if (!p.pierce) {
+                            game.projectiles.splice(i, 1);
+                        }
+                    }
+                });
+                
+                // Remove if out of bounds
+                if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+                    game.projectiles.splice(i, 1);
+                }
+            });
+            
+            // Update monsters
+            game.monsters.forEach((m, i) => {
+                // Frozen
+                if (m.frozen > 0) {
+                    m.frozen--;
+                    return;
+                }
+                
+                // Poison
+                if (m.poisoned > 0) {
+                    m.hp -= 0.5;
+                    m.poisoned--;
+                }
+                
+                // Move toward player
+                const angle = Math.atan2(player.y - m.y, player.x - m.x);
+                let speed = m.speed;
+                if (m.slowed) speed *= 0.5;
+                m.x += Math.cos(angle) * speed;
+                m.y += Math.sin(angle) * speed;
+                
+                // Attack player
+                const dist = Math.hypot(m.x - player.x, m.y - player.y);
+                if (dist < player.radius + 20 && m.attackCooldown <= 0) {
+                    let dmg = m.damage;
+                    
+                    // Defense
+                    const shield = game.powerups.find(s => s.id === 'shield');
+                    if (shield) dmg *= shield.effect.defense;
+                    
+                    // Thorns
+                    const thorn = game.powerups.find(t => t.id === 'thorn');
+                    if (thorn) {
+                        m.hp -= dmg * thorn.effect.thorn;
+                    }
+                    
+                    player.hp -= dmg;
+                    m.attackCooldown = 60;
+                    
+                    // Screen shake
+                    game.camera.x = (Math.random() - 0.5) * 10;
+                    game.camera.y = (Math.random() - 0.5) * 10;
+                }
+                if (m.attackCooldown > 0) m.attackCooldown--;
+                
+                // Death
+                if (m.hp <= 0) {
+                    // Drop crystals
+                    let crystalAmount = m.crystals;
+                    const lucky = game.powerups.find(l => l.id === 'lucky');
+                    if (lucky) crystalAmount *= lucky.effect.crystalMult;
+                    
+                    game.crystals_drops.push({
+                        x: m.x,
+                        y: m.y,
+                        amount: Math.floor(crystalAmount),
+                        life: 300
+                    });
+                    
+                    // XP
+                    game.xp += m.xp;
+                    if (game.xp >= game.xpToNext) {
+                        game.level++;
+                        game.xp -= game.xpToNext;
+                        game.xpToNext = Math.floor(game.xpToNext * 1.2);
+                        player.maxHp += 10;
+                        player.hp += 10;
+                    }
+                    
+                    // Particles
+                    for (let j = 0; j < 5; j++) {
+                        game.particles.push({
+                            x: m.x,
+                            y: m.y,
+                            vx: (Math.random() - 0.5) * 5,
+                            vy: (Math.random() - 0.5) * 5,
+                            life: 30,
+                            color: '#ff6b6b'
+                        });
+                    }
+                    
+                    game.monsters.splice(i, 1);
+                }
+            });
+            
+            // Collect crystals
+            const magnet = game.powerups.find(p => p.id === 'magnet');
+            const magnetRange = magnet ? magnet.effect.magnet : 30;
+            
+            game.crystals_drops.forEach((c, i) => {
+                const dist = Math.hypot(c.x - player.x, c.y - player.y);
+                if (dist < magnetRange) {
+                    // Move toward player
+                    const angle = Math.atan2(player.y - c.y, player.x - c.x);
+                    c.x += Math.cos(angle) * 5;
+                    c.y += Math.sin(angle) * 5;
+                }
+                if (dist < player.radius + 10) {
+                    game.crystals += c.amount;
+                    game.crystals_drops.splice(i, 1);
+                }
+                c.life--;
+                if (c.life <= 0) game.crystals_drops.splice(i, 1);
+            });
+            
+            // Update particles
+            game.particles.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0) game.particles.splice(i, 1);
+            });
+            
+            // Check wave complete
+            if (game.monsters.length === 0 && game.running) {
+                game.wave++;
+                if (game.wave > 30) {
+                    victory();
+                    return;
+                }
+                
+                // Every 5 waves: new powerup
+                if (game.wave % 5 === 1 && game.wave > 1) {
+                    showNewPowerupMenu();
+                } else {
+                    showUpgradeMenu();
+                }
+            }
+            
+            // Check death
+            if (player.hp <= 0) {
+                gameOver();
+            }
+            
+            // Camera shake decay
+            game.camera.x *= 0.9;
+            game.camera.y *= 0.9;
+            
+            updateHUD();
+        }
+
+        function draw() {
+            // Clear
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.save();
+            ctx.translate(game.camera.x, game.camera.y);
+            
+            // Draw arena
+            ctx.strokeStyle = '#e94560';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(ARENA.x, ARENA.y, ARENA.width, ARENA.height);
+            
+            // Draw grid
+            ctx.strokeStyle = 'rgba(233, 69, 96, 0.2)';
+            ctx.lineWidth = 1;
+            for (let x = ARENA.x; x <= ARENA.x + ARENA.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, ARENA.y);
+                ctx.lineTo(x, ARENA.y + ARENA.height);
+                ctx.stroke();
+            }
+            for (let y = ARENA.y; y <= ARENA.y + ARENA.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(ARENA.x, y);
+                ctx.lineTo(ARENA.x + ARENA.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw crystals
+            game.crystals_drops.forEach(c => {
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('💎', c.x, c.y);
+                ctx.fillStyle = '#00bfff';
+                ctx.font = '12px Arial';
+                ctx.fillText(c.amount, c.x, c.y + 15);
+            });
+            
+            // Draw projectiles
+            game.projectiles.forEach(p => {
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.emoji, p.x, p.y);
+            });
+            
+            // Draw monsters
+            game.monsters.forEach(m => {
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(m.emoji, m.x, m.y);
+                
+                // HP bar
+                const hpPct = m.hp / m.maxHp;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(m.x - 15, m.y - 25, 30, 4);
+                ctx.fillStyle = hpPct > 0.5 ? '#4ecdc4' : hpPct > 0.25 ? '#f7b731' : '#e94560';
+                ctx.fillRect(m.x - 15, m.y - 25, 30 * hpPct, 4);
+            });
+            
+            // Draw player
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🦸', player.x, player.y);
+            
+            // Player direction indicator
+            const angle = Math.atan2(player.facing.y, player.facing.x);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y - 10);
+            ctx.lineTo(player.x + Math.cos(angle) * 20, player.y + Math.sin(angle) * 20 - 10);
+            ctx.stroke();
+            
+            // Draw particles
+            game.particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+                ctx.globalAlpha = 1;
+            });
+            
+            ctx.restore();
+        }
+
+        function updateHUD() {
+            document.getElementById('hp').textContent = Math.floor(player.hp);
+            document.getElementById('level').textContent = game.level;
+            document.getElementById('crystals').textContent = game.crystals;
+            document.getElementById('wave').textContent = game.wave;
+        }
+
+        function showUpgradeMenu() {
+            game.paused = true;
+            document.getElementById('upgradeMenu').classList.remove('hidden');
+            
+            const grid = document.getElementById('upgradeGrid');
+            grid.innerHTML = '';
+            
+            game.powerups.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'upgrade-card';
+                card.innerHTML = `
+                    <div style="font-size: 36px; margin-bottom: 10px;">${p.icon}</div>
+                    <div style="color: white; font-weight: bold;">${p.name}</div>
+                    <div class="level">Level ${p.level} → ${p.level + 1}</div>
+                    <div style="color: #4ecdc4; margin-top: 10px;">Upgrade</div>
+                `;
+                card.onclick = () => upgradePowerup(p);
+                grid.appendChild(card);
+            });
+        }
+
+        function upgradePowerup(p) {
+            p.level++;
+            applyPowerupEffects();
+            document.getElementById('upgradeMenu').classList.add('hidden');
+            game.paused = false;
+            spawnWave();
+        }
+
+        function skipUpgrade() {
+            document.getElementById('upgradeMenu').classList.add('hidden');
+            game.paused = false;
+            spawnWave();
+        }
+
+        function showNewPowerupMenu() {
+            game.paused = true;
+            document.getElementById('newPowerupMenu').classList.remove('hidden');
+            
+            const grid = document.getElementById('newPowerupGrid');
+            grid.innerHTML = '';
+            
+            // Filter out owned powerups
+            const owned = game.powerups.map(p => p.id);
+            const available = POWERUPS.filter(p => !owned.includes(p.id));
+            const choices = available.sort(() => Math.random() - 0.5).slice(0, 5);
+            
+            choices.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'powerup-card';
+                card.innerHTML = `
+                    <div class="icon">${p.icon}</div>
+                    <div class="name">${p.name}</div>
+                    <div class="desc">${p.desc}</div>
+                `;
+                card.onclick = () => selectNewPowerup(p);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectNewPowerup(p) {
+            game.powerups.push({ ...p, level: 1 });
+            applyPowerupEffects();
+            document.getElementById('newPowerupMenu').classList.add('hidden');
+            game.paused = false;
+            spawnWave();
+        }
+
+        function openShop() {
+            game.paused = true;
+            document.getElementById('shopMenu').classList.remove('hidden');
+            document.getElementById('shopCrystals').textContent = game.crystals;
+            
+            const grid = document.getElementById('shopGrid');
+            grid.innerHTML = '';
+            
+            const items = [
+                { name: 'Heal', icon: '💚', price: 50, action: () => { player.hp = player.maxHp; } },
+                { name: 'Max HP +20', icon: '❤️', price: 100, action: () => { player.maxHp += 20; player.hp += 20; } },
+                { name: 'Damage +10%', icon: '⚔️', price: 150, action: () => { /* Apply damage boost */ } },
+                { name: 'Speed +10%', icon: '👢', price: 120, action: () => { player.speed *= 1.1; } }
+            ];
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'shop-item';
+                card.innerHTML = `
+                    <div style="font-size: 30px; margin-bottom: 10px;">${item.icon}</div>
+                    <div style="color: white; font-weight: bold;">${item.name}</div>
+                    <div class="price">${item.price} 💎</div>
+                `;
+                card.onclick = () => {
+                    if (game.crystals >= item.price) {
+                        game.crystals -= item.price;
+                        item.action();
+                        updateHUD();
+                        document.getElementById('shopCrystals').textContent = game.crystals;
+                    }
+                };
+                grid.appendChild(card);
+            });
+        }
+
+        function closeShop() {
+            document.getElementById('shopMenu').classList.add('hidden');
+            game.paused = false;
+        }
+
+        function gameOver() {
+            game.running = false;
+            document.getElementById('gameOverMenu').classList.remove('hidden');
+            document.getElementById('gameOverTitle').textContent = '💀 GAME OVER';
+            document.getElementById('finalWave').textContent = game.wave;
+            document.getElementById('finalCrystals').textContent = game.crystals;
+        }
+
+        function victory() {
+            game.running = false;
+            document.getElementById('gameOverMenu').classList.remove('hidden');
+            document.getElementById('gameOverTitle').textContent = '🎉 VICTORY!';
+            document.getElementById('finalWave').textContent = '30 (Complete!)';
+            document.getElementById('finalCrystals').textContent = game.crystals;
         }
 
         function resetGame() {
-            gameState = {
-                player: null,
-                enemy: null,
-                wave: 1,
-                playerEnergy: 0,
-                enemyEnergy: 0,
-                healsLeft: 3,
-                defending: false,
-                turn: 'player'
-            };
-            selectedMonster = null;
-
-            document.getElementById('game-over').classList.remove('show');
-            document.getElementById('battle-screen').style.display = 'none';
-            document.getElementById('selection-screen').style.display = 'block';
-            document.querySelectorAll('.monster-card').forEach(c => c.classList.remove('selected'));
-            document.getElementById('combat-log').innerHTML = '<div class="log-entry">Battle started! Choose your action!</div>';
+            document.getElementById('gameOverMenu').classList.add('hidden');
+            document.getElementById('startMenu').classList.remove('hidden');
+            game.powerups = [];
+            selectedStartPowerup = null;
         }
+
+        function gameLoop() {
+            if (!game.running) return;
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Shop key (S)
+        document.addEventListener('keydown', e => {
+            if (e.key === 's' || e.key === 'S') {
+                if (game.running && !game.paused) openShop();
+            }
+        });
     </script>
 </body>
 </html>
