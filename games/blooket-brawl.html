@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monster Brawl</title>
+    <title>Monster Brawl - Blooket Style</title>
     <style>
         * {
             margin: 0;
@@ -24,7 +24,7 @@
 
         .game-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             padding: 20px;
         }
 
@@ -32,266 +32,271 @@
             text-align: center;
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 0 0 20px #e94560, 0 0 40px #e94560;
-            animation: glow 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px #e94560;
         }
 
-        @keyframes glow {
-            from { text-shadow: 0 0 20px #e94560, 0 0 40px #e94560; }
-            to { text-shadow: 0 0 30px #ff6b6b, 0 0 60px #ff6b6b; }
-        }
-
+        /* Battle Arena */
         .battle-arena {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 20px;
             padding: 30px;
             margin: 20px 0;
-            border: 2px solid #e94560;
+            border: 3px solid #e94560;
             box-shadow: 0 0 30px rgba(233, 69, 96, 0.3);
         }
 
         .battle-field {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 40px;
+            align-items: flex-end;
+            gap: 20px;
             margin-bottom: 30px;
+            min-height: 250px;
+            position: relative;
         }
 
-        .monster-card {
-            flex: 1;
+        .monster {
             text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .monster-card.active {
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .monster-card.player {
-            border-color: #4ecdc4;
-        }
-
-        .monster-card.enemy {
-            border-color: #e94560;
+            flex: 1;
+            position: relative;
         }
 
         .monster-emoji {
-            font-size: 5em;
-            margin-bottom: 10px;
+            font-size: 6em;
             animation: bounce 1s ease infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
 
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .monster.attacking {
+            animation: attackLunge 0.5s ease;
+        }
+
+        .monster.hurt {
+            animation: hurtShake 0.5s ease;
+        }
+
+        @keyframes attackLunge {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(50px) scale(1.2); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes hurtShake {
+            0%, 100% { transform: translateX(0); filter: brightness(1); }
+            25% { transform: translateX(-10px); filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(5); }
+            50% { transform: translateX(10px); filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(5); }
+            75% { transform: translateX(-10px); filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(5); }
         }
 
         .monster-name {
             font-size: 1.3em;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .hp-bar-container {
+            width: 100%;
+            max-width: 200px;
+            margin: 10px auto;
         }
 
         .hp-bar {
-            width: 100%;
-            height: 25px;
+            height: 30px;
             background: #333;
             border-radius: 15px;
             overflow: hidden;
-            margin-bottom: 10px;
-            border: 2px solid #555;
+            border: 3px solid #555;
+            position: relative;
         }
 
         .hp-fill {
             height: 100%;
             border-radius: 15px;
-            transition: width 0.5s ease, background-color 0.3s ease;
+            transition: width 0.5s ease;
         }
 
-        .hp-fill.high { background: linear-gradient(90deg, #4ecdc4, #44a08d); }
-        .hp-fill.medium { background: linear-gradient(90deg, #f7b731, #e58e26); }
-        .hp-fill.low { background: linear-gradient(90deg, #e94560, #c0392b); }
+        .hp-fill.player { background: linear-gradient(90deg, #4ecdc4, #44a08d); }
+        .hp-fill.enemy { background: linear-gradient(90deg, #e94560, #c0392b); }
 
         .hp-text {
-            font-size: 0.9em;
-            color: #aaa;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
         }
 
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-            font-size: 0.85em;
+        /* Question Section */
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
         }
 
-        .stat {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 10px;
+        .timer-bar {
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
         }
 
-        .vs-badge {
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            border-radius: 5px;
+            transition: width 0.1s linear;
+        }
+
+        .timer-fill.low { background: linear-gradient(90deg, #e94560, #c0392b); }
+
+        .question-text {
             font-size: 2em;
             font-weight: bold;
-            color: #e94560;
-            text-shadow: 0 0 10px #e94560;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .action-panel {
+        /* Answer Buttons */
+        .answers-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-top: 20px;
         }
 
-        .action-btn {
-            padding: 15px 20px;
-            font-size: 1em;
+        .answer-btn {
+            padding: 20px;
+            font-size: 1.5em;
             font-weight: bold;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-attack {
-            background: linear-gradient(135deg, #e94560, #c0392b);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        .btn-heal {
-            background: linear-gradient(135deg, #4ecdc4, #44a08d);
-            color: white;
-        }
-
-        .btn-special {
-            background: linear-gradient(135deg, #f7b731, #e58e26);
-            color: white;
-        }
-
-        .btn-block {
-            background: linear-gradient(135deg, #6c5ce7, #5f3dc4);
-            color: white;
-        }
-
-        .log-panel {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #444;
-        }
-
-        .log-entry {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .log-entry.damage { color: #ff6b6b; }
-        .log-entry.heal { color: #4ecdc4; }
-        .log-entry.special { color: #f7b731; }
-        .log-entry.block { color: #6c5ce7; }
-
-        .turn-indicator {
-            text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        .turn-indicator.player-turn {
-            border: 2px solid #4ecdc4;
-            color: #4ecdc4;
-        }
-
-        .turn-indicator.enemy-turn {
-            border: 2px solid #e94560;
-            color: #e94560;
-        }
-
-        .monster-select {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .monster-option {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .monster-option:hover {
+        .answer-btn:hover:not(:disabled) {
             transform: scale(1.05);
-            border-color: #4ecdc4;
-        }
-
-        .monster-option.selected {
             border-color: #ffd700;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
 
-        .monster-option .emoji {
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d) !important;
+            border-color: #00ff00 !important;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(135deg, #e94560, #c0392b) !important;
+            border-color: #ff0000 !important;
+            animation: wrongShake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Damage Effects */
+        .damage-popup {
+            position: absolute;
             font-size: 3em;
+            font-weight: bold;
+            animation: damageFloat 1s ease forwards;
+            pointer-events: none;
+            z-index: 100;
         }
 
-        .monster-option .name {
-            margin-top: 10px;
-            font-weight: bold;
+        .damage-popup.player-dmg {
+            color: #ff0000;
+            right: 20%;
+            top: 30%;
         }
 
-        .start-btn {
-            display: block;
-            margin: 30px auto;
-            padding: 20px 60px;
-            font-size: 1.5em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #e94560, #c0392b);
-            color: white;
-            border: none;
+        .damage-popup.enemy-dmg {
+            color: #ffff00;
+            left: 20%;
+            top: 30%;
+        }
+
+        @keyframes damageFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+        }
+
+        /* Power Up Indicators */
+        .power-ups {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .power-up {
+            width: 60px;
+            height: 60px;
             border-radius: 15px;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            border: 3px solid #555;
+            opacity: 0.3;
             transition: all 0.3s ease;
         }
 
-        .start-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+        .power-up.active {
+            opacity: 1;
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: glow 1s ease infinite alternate;
         }
 
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+        }
+
+        .power-up.shield { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .power-up.sword { background: linear-gradient(135deg, #e94560, #c0392b); }
+        .power-up.heal { background: linear-gradient(135deg, #96c93d, #00b09b); }
+
+        /* Streak Counter */
+        .streak-counter {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .streak {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        /* Game Over */
         .game-over {
             position: fixed;
             top: 0;
@@ -308,52 +313,102 @@
 
         .game-over h2 {
             font-size: 4em;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .game-over.win h2 { color: #4ecdc4; }
         .game-over.lose h2 { color: #e94560; }
 
-        .damage-popup {
-            position: absolute;
-            font-size: 2em;
+        .btn-primary {
+            padding: 20px 60px;
+            font-size: 1.5em;
             font-weight: bold;
-            animation: damageFloat 1s ease forwards;
-            pointer-events: none;
+            background: linear-gradient(135deg, #e94560, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        @keyframes damageFloat {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
         }
 
         .hidden { display: none !important; }
 
-        .level-badge {
-            display: inline-block;
-            background: #ffd700;
-            color: #000;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.8em;
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .monster-select {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .monster-option {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            min-width: 120px;
+        }
+
+        .monster-option:hover {
+            transform: scale(1.1);
+            border-color: #ffd700;
+        }
+
+        .monster-option.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .monster-option .emoji {
+            font-size: 4em;
+        }
+
+        .monster-option .name {
+            margin-top: 10px;
             font-weight: bold;
-            margin-left: 10px;
         }
 
-        .xp-bar {
-            width: 100%;
-            height: 8px;
-            background: #333;
-            border-radius: 4px;
+        .monster-option .stats {
+            font-size: 0.8em;
+            color: #aaa;
             margin-top: 5px;
-            overflow: hidden;
         }
 
-        .xp-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ffd700, #ffed4e);
-            border-radius: 4px;
-            transition: width 0.5s ease;
+        /* Combo Text */
+        .combo-text {
+            position: absolute;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+            animation: comboPop 1s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes comboPop {
+            0% { opacity: 0; transform: scale(0) rotate(-20deg); }
+            50% { opacity: 1; transform: scale(1.5) rotate(10deg); }
+            100% { opacity: 0; transform: scale(2) rotate(0deg) translateY(-50px); }
+        }
+
+        .vs-text {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
     </style>
 </head>
@@ -361,141 +416,130 @@
     <div class="game-container">
         <h1>👾 MONSTER BRAWL 👾</h1>
 
-        <!-- Character Selection -->
-        <div id="selection-screen">
-            <h2 style="text-align: center; margin-bottom: 20px;">Choose Your Monster</h2>
+        <!-- Start Screen -->
+        <div id="start-screen" class="start-screen">
+            <h2>Choose Your Monster</h2>
             <div class="monster-select">
                 <div class="monster-option" data-monster="dragon">
                     <div class="emoji">🐉</div>
                     <div class="name">Dragon</div>
-                    <div style="font-size: 0.8em; color: #aaa;">High ATK</div>
+                    <div class="stats">⚔️ High ATK</div>
                 </div>
                 <div class="monster-option" data-monster="golem">
                     <div class="emoji">🗿</div>
                     <div class="name">Golem</div>
-                    <div style="font-size: 0.8em; color: #aaa;">High HP</div>
+                    <div class="stats">🛡️ High HP</div>
                 </div>
                 <div class="monster-option" data-monster="unicorn">
                     <div class="emoji">🦄</div>
                     <div class="name">Unicorn</div>
-                    <div style="font-size: 0.8em; color: #aaa;">Balanced</div>
+                    <div class="stats">⚡ Balanced</div>
                 </div>
                 <div class="monster-option" data-monster="ghost">
                     <div class="emoji">👻</div>
                     <div class="name">Ghost</div>
-                    <div style="font-size: 0.8em; color: #aaa;">High SPD</div>
+                    <div class="stats">👻 Fast</div>
                 </div>
             </div>
-            <button class="start-btn" onclick="startGame()">START BATTLE</button>
+            <button class="btn-primary" onclick="startGame()">START BATTLE</button>
         </div>
 
         <!-- Battle Screen -->
         <div id="battle-screen" class="hidden">
             <div class="battle-arena">
-                <div class="turn-indicator player-turn" id="turn-indicator">
-                    ⚔️ YOUR TURN ⚔️
+                <div class="streak-counter">
+                    🔥 Streak: <span class="streak" id="streak">0</span> | 
+                    ⚡ Combo: x<span id="combo-multiplier">1</span>
                 </div>
 
-                <div class="battle-field">
-                    <div class="monster-card player" id="player-card">
+                <div class="power-ups">
+                    <div class="power-up shield" id="shield-power">🛡️</div>
+                    <div class="power-up sword" id="sword-power">⚔️</div>
+                    <div class="power-up heal" id="heal-power">💚</div>
+                </div>
+
+                <div class="battle-field" id="battle-field">
+                    <div class="monster" id="player-monster">
                         <div class="monster-emoji" id="player-emoji">🐉</div>
-                        <div class="monster-name">
-                            <span id="player-name">Dragon</span>
-                            <span class="level-badge">Lv.<span id="player-level">1</span></span>
-                        </div>
-                        <div class="hp-bar">
-                            <div class="hp-fill high" id="player-hp-bar" style="width: 100%;"></div>
-                        </div>
-                        <div class="hp-text"><span id="player-hp">100</span> / <span id="player-max-hp">100</span> HP</div>
-                        <div class="xp-bar">
-                            <div class="xp-fill" id="player-xp-bar" style="width: 0%;"></div>
-                        </div>
-                        <div class="stats">
-                            <div class="stat">⚔️ <span id="player-atk">25</span></div>
-                            <div class="stat">🛡️ <span id="player-def">10</span></div>
-                            <div class="stat">⚡ <span id="player-spd">15</span></div>
+                        <div class="monster-name" id="player-name">Dragon</div>
+                        <div class="hp-bar-container">
+                            <div class="hp-bar">
+                                <div class="hp-fill player" id="player-hp" style="width: 100%;"></div>
+                            </div>
+                            <div class="hp-text"><span id="player-hp-text">100</span>/100</div>
                         </div>
                     </div>
 
-                    <div class="vs-badge">VS</div>
+                    <div class="vs-text">VS</div>
 
-                    <div class="monster-card enemy" id="enemy-card">
+                    <div class="monster" id="enemy-monster">
                         <div class="monster-emoji" id="enemy-emoji">👹</div>
-                        <div class="monster-name">
-                            <span id="enemy-name">Orc Warrior</span>
-                            <span class="level-badge">Lv.<span id="enemy-level">1</span></span>
-                        </div>
-                        <div class="hp-bar">
-                            <div class="hp-fill high" id="enemy-hp-bar" style="width: 100%;"></div>
-                        </div>
-                        <div class="hp-text"><span id="enemy-hp">80</span> / <span id="enemy-max-hp">80</span> HP</div>
-                        <div class="stats">
-                            <div class="stat">⚔️ <span id="enemy-atk">20</span></div>
-                            <div class="stat">🛡️ <span id="enemy-def">8</span></div>
-                            <div class="stat">⚡ <span id="enemy-spd">12</span></div>
+                        <div class="monster-name" id="enemy-name">Orc Warrior</div>
+                        <div class="hp-bar-container">
+                            <div class="hp-bar">
+                                <div class="hp-fill enemy" id="enemy-hp" style="width: 100%;"></div>
+                            </div>
+                            <div class="hp-text"><span id="enemy-hp-text">80</span>/80</div>
                         </div>
                     </div>
-                </div>
-
-                <div class="action-panel">
-                    <button class="action-btn btn-attack" onclick="playerAction('attack')">
-                        ⚔️ ATTACK
-                    </button>
-                    <button class="action-btn btn-heal" onclick="playerAction('heal')">
-                        💚 HEAL
-                    </button>
-                    <button class="action-btn btn-special" onclick="playerAction('special')">
-                        ✨ SPECIAL
-                    </button>
-                    <button class="action-btn btn-block" onclick="playerAction('block')">
-                        🛡️ BLOCK
-                    </button>
                 </div>
             </div>
 
-            <div class="log-panel" id="battle-log">
-                <div class="log-entry">Battle started! Choose your action!</div>
+            <div class="question-box">
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timer" style="width: 100%;"></div>
+                </div>
+                <div class="question-text" id="question">5 + 3 = ?</div>
+                <div class="answers-grid" id="answers">
+                    <button class="answer-btn" onclick="checkAnswer(0)">6</button>
+                    <button class="answer-btn" onclick="checkAnswer(1)">7</button>
+                    <button class="answer-btn" onclick="checkAnswer(2)">8</button>
+                    <button class="answer-btn" onclick="checkAnswer(3)">9</button>
+                </div>
             </div>
         </div>
 
-        <!-- Game Over Screen -->
+        <!-- Game Over -->
         <div id="game-over" class="game-over hidden">
-            <h2 id="game-result">VICTORY!</h2>
-            <div style="font-size: 1.5em; margin-bottom: 30px;" id="game-reward"></div>
-            <button class="start-btn" onclick="resetGame()">PLAY AGAIN</button>
+            <h2 id="result-text">VICTORY!</h2>
+            <p id="result-stats"></p>
+            <button class="btn-primary" onclick="resetGame()">PLAY AGAIN</button>
         </div>
     </div>
 
     <script>
         // Monster templates
         const MONSTERS = {
-            dragon: { name: 'Dragon', emoji: '🐉', hp: 90, atk: 30, def: 12, spd: 10, special: 'Fire Breath' },
-            golem: { name: 'Golem', emoji: '🗿', hp: 120, atk: 20, def: 20, spd: 5, special: 'Earthquake' },
-            unicorn: { name: 'Unicorn', emoji: '🦄', hp: 100, atk: 22, def: 15, spd: 18, special: 'Rainbow Blast' },
-            ghost: { name: 'Ghost', emoji: '👻', hp: 85, atk: 25, def: 8, spd: 25, special: 'Haunt' }
+            dragon: { name: 'Dragon', emoji: '🐉', hp: 90, atk: 30, def: 12 },
+            golem: { name: 'Golem', emoji: '🗿', hp: 120, atk: 20, def: 20 },
+            unicorn: { name: 'Unicorn', emoji: '🦄', hp: 100, atk: 22, def: 15 },
+            ghost: { name: 'Ghost', emoji: '👻', hp: 85, atk: 25, def: 8 }
         };
 
-        // Enemy types
         const ENEMIES = [
-            { name: 'Orc Warrior', emoji: '👹', hp: 80, atk: 20, def: 8, spd: 12 },
-            { name: 'Dark Knight', emoji: '⚔️', hp: 100, atk: 22, def: 15, spd: 10 },
-            { name: 'Shadow Beast', emoji: '🐺', hp: 70, atk: 28, def: 6, spd: 20 },
-            { name: 'Ice Golem', emoji: '🧊', hp: 110, atk: 18, def: 18, spd: 4 },
-            { name: 'Demon Lord', emoji: '👿', hp: 150, atk: 35, def: 20, spd: 15 }
+            { name: 'Orc Warrior', emoji: '👹', hp: 80, atk: 20 },
+            { name: 'Dark Knight', emoji: '⚔️', hp: 100, atk: 22 },
+            { name: 'Shadow Beast', emoji: '🐺', hp: 70, atk: 28 },
+            { name: 'Ice Golem', emoji: '🧊', hp: 110, atk: 18 },
+            { name: 'Demon Lord', emoji: '👿', hp: 150, atk: 35 }
         ];
 
         let gameState = {
             player: null,
             enemy: null,
-            turn: 'player',
-            battleCount: 0,
-            playerWins: 0,
-            blocking: false
+            streak: 0,
+            combo: 1,
+            timer: null,
+            timeLeft: 10,
+            currentQuestion: null,
+            shield: false,
+            sword: false,
+            battleCount: 0
         };
 
         let selectedMonster = null;
 
-        // Selection screen
+        // Monster selection
         document.querySelectorAll('.monster-option').forEach(option => {
             option.addEventListener('click', () => {
                 document.querySelectorAll('.monster-option').forEach(o => o.classList.remove('selected'));
@@ -506,7 +550,7 @@
 
         function startGame() {
             if (!selectedMonster) {
-                alert('Please select a monster!');
+                alert('Choose a monster!');
                 return;
             }
 
@@ -514,266 +558,293 @@
             gameState.player = {
                 ...template,
                 currentHp: template.hp,
-                level: 1,
-                xp: 0,
-                xpToNext: 100
+                maxHp: template.hp
             };
 
             spawnEnemy();
-            updateUI();
             
-            document.getElementById('selection-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('battle-screen').classList.remove('hidden');
             
-            addLog('Battle begins! You face a wild ' + gameState.enemy.name + '!', 'special');
+            updateUI();
+            nextQuestion();
         }
 
         function spawnEnemy() {
             const enemyTemplate = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
-            const level = Math.max(1, gameState.player.level + Math.floor(Math.random() * 3) - 1);
+            const level = Math.min(5, gameState.battleCount + 1);
             
             gameState.enemy = {
                 ...enemyTemplate,
-                currentHp: enemyTemplate.hp + (level - 1) * 10,
-                maxHp: enemyTemplate.hp + (level - 1) * 10,
-                atk: enemyTemplate.atk + (level - 1) * 2,
-                def: enemyTemplate.def + (level - 1) * 1,
+                currentHp: enemyTemplate.hp + (level - 1) * 15,
+                maxHp: enemyTemplate.hp + (level - 1) * 15,
+                atk: enemyTemplate.atk + (level - 1) * 3,
                 level: level
             };
+        }
+
+        function generateQuestion() {
+            const types = ['add', 'sub', 'mul', 'div'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            let q, a, options;
+
+            switch(type) {
+                case 'add':
+                    const a1 = Math.floor(Math.random() * 20) + 5;
+                    const a2 = Math.floor(Math.random() * 20) + 5;
+                    q = `${a1} + ${a2} = ?`;
+                    a = a1 + a2;
+                    break;
+                case 'sub':
+                    const s1 = Math.floor(Math.random() * 30) + 10;
+                    const s2 = Math.floor(Math.random() * s1);
+                    q = `${s1} - ${s2} = ?`;
+                    a = s1 - s2;
+                    break;
+                case 'mul':
+                    const m1 = Math.floor(Math.random() * 12) + 2;
+                    const m2 = Math.floor(Math.random() * 10) + 2;
+                    q = `${m1} × ${m2} = ?`;
+                    a = m1 * m2;
+                    break;
+                case 'div':
+                    const d2 = Math.floor(Math.random() * 10) + 2;
+                    a = Math.floor(Math.random() * 10) + 2;
+                    const d1 = d2 * a;
+                    q = `${d1} ÷ ${d2} = ?`;
+                    break;
+            }
+
+            options = [a];
+            while (options.length < 4) {
+                let wrong = a + Math.floor(Math.random() * 20) - 10;
+                if (wrong !== a && wrong > 0 && !options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            return { q, a, options };
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestion = generateQuestion();
+            document.getElementById('question').textContent = gameState.currentQuestion.q;
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach((btn, i) => {
+                btn.textContent = gameState.currentQuestion.options[i];
+                btn.className = 'answer-btn';
+                btn.disabled = false;
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            gameState.timeLeft = 10;
+            clearInterval(gameState.timer);
+            
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft -= 0.1;
+                const pct = (gameState.timeLeft / 10) * 100;
+                document.getElementById('timer').style.width = pct + '%';
+                
+                if (gameState.timeLeft <= 3) {
+                    document.getElementById('timer').classList.add('low');
+                } else {
+                    document.getElementById('timer').classList.remove('low');
+                }
+
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    timeUp();
+                }
+            }, 100);
+        }
+
+        function checkAnswer(index) {
+            clearInterval(gameState.timer);
+            const buttons = document.querySelectorAll('.answer-btn');
+            const selected = gameState.currentQuestion.options[index];
+            const correct = gameState.currentQuestion.a;
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                buttons[index].classList.add('correct');
+                correctAnswer();
+            } else {
+                buttons[index].classList.add('wrong');
+                buttons.forEach((btn, i) => {
+                    if (gameState.currentQuestion.options[i] === correct) {
+                        btn.classList.add('correct');
+                    }
+                });
+                wrongAnswer();
+            }
+        }
+
+        function correctAnswer() {
+            gameState.streak++;
+            
+            // Combo multiplier
+            if (gameState.streak >= 3) gameState.combo = 2;
+            if (gameState.streak >= 5) gameState.combo = 3;
+            if (gameState.streak >= 7) gameState.combo = 4;
+
+            // Power ups
+            if (gameState.streak >= 3) activatePowerUp('shield');
+            if (gameState.streak >= 5) activatePowerUp('sword');
+            if (gameState.streak >= 7) activatePowerUp('heal');
+
+            updateUI();
+
+            // Attack enemy
+            let damage = gameState.player.atk * gameState.combo;
+            if (gameState.sword) damage *= 1.5;
+            damage = Math.floor(damage);
+
+            gameState.enemy.currentHp -= damage;
+            
+            animateAttack('player-monster');
+            showDamage(damage, 'enemy-dmg');
+
+            setTimeout(() => {
+                if (gameState.enemy.currentHp <= 0) {
+                    winBattle();
+                } else {
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function wrongAnswer() {
+            gameState.streak = 0;
+            gameState.combo = 1;
+            gameState.shield = false;
+            gameState.sword = false;
+            updateUI();
+
+            // Enemy attacks
+            let damage = gameState.enemy.atk;
+            if (gameState.shield) damage = Math.floor(damage / 2);
+            damage = Math.max(1, damage - Math.floor(gameState.player.def / 3));
+
+            gameState.player.currentHp -= damage;
+
+            animateAttack('enemy-monster');
+            showDamage(damage, 'player-dmg');
+
+            setTimeout(() => {
+                if (gameState.player.currentHp <= 0) {
+                    gameOver(false);
+                } else {
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function timeUp() {
+            wrongAnswer();
+        }
+
+        function activatePowerUp(type) {
+            document.getElementById(type + '-power').classList.add('active');
+            if (type === 'shield') gameState.shield = true;
+            if (type === 'sword') gameState.sword = true;
+            if (type === 'heal') {
+                gameState.player.currentHp = Math.min(gameState.player.maxHp, gameState.player.currentHp + 30);
+                updateUI();
+            }
+        }
+
+        function animateAttack(monsterId) {
+            const monster = document.getElementById(monsterId);
+            monster.classList.add('attacking');
+            
+            const otherId = monsterId === 'player-monster' ? 'enemy-monster' : 'player-monster';
+            setTimeout(() => {
+                document.getElementById(otherId).classList.add('hurt');
+            }, 250);
+
+            setTimeout(() => {
+                monster.classList.remove('attacking');
+                document.getElementById(otherId).classList.remove('hurt');
+            }, 500);
+        }
+
+        function showDamage(amount, className) {
+            const popup = document.createElement('div');
+            popup.className = 'damage-popup ' + className;
+            popup.textContent = '-' + amount;
+            document.getElementById('battle-field').appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
         }
 
         function updateUI() {
             // Player
             document.getElementById('player-emoji').textContent = gameState.player.emoji;
             document.getElementById('player-name').textContent = gameState.player.name;
-            document.getElementById('player-level').textContent = gameState.player.level;
-            document.getElementById('player-hp').textContent = Math.max(0, gameState.player.currentHp);
-            document.getElementById('player-max-hp').textContent = gameState.player.hp;
-            document.getElementById('player-atk').textContent = gameState.player.atk;
-            document.getElementById('player-def').textContent = gameState.player.def;
-            document.getElementById('player-spd').textContent = gameState.player.spd;
-            
-            const playerHpPercent = (gameState.player.currentHp / gameState.player.hp) * 100;
-            const playerHpBar = document.getElementById('player-hp-bar');
-            playerHpBar.style.width = playerHpPercent + '%';
-            playerHpBar.className = 'hp-fill ' + (playerHpPercent > 50 ? 'high' : playerHpPercent > 25 ? 'medium' : 'low');
-            
-            const xpPercent = (gameState.player.xp / gameState.player.xpToNext) * 100;
-            document.getElementById('player-xp-bar').style.width = xpPercent + '%';
+            document.getElementById('player-hp-text').textContent = Math.max(0, gameState.player.currentHp);
+            const playerPct = (gameState.player.currentHp / gameState.player.maxHp) * 100;
+            document.getElementById('player-hp').style.width = playerPct + '%';
 
             // Enemy
             document.getElementById('enemy-emoji').textContent = gameState.enemy.emoji;
-            document.getElementById('enemy-name').textContent = gameState.enemy.name;
-            document.getElementById('enemy-level').textContent = gameState.enemy.level;
-            document.getElementById('enemy-hp').textContent = Math.max(0, gameState.enemy.currentHp);
-            document.getElementById('enemy-max-hp').textContent = gameState.enemy.maxHp;
-            document.getElementById('enemy-atk').textContent = gameState.enemy.atk;
-            document.getElementById('enemy-def').textContent = gameState.enemy.def;
-            document.getElementById('enemy-spd').textContent = gameState.enemy.spd;
-            
-            const enemyHpPercent = (gameState.enemy.currentHp / gameState.enemy.maxHp) * 100;
-            const enemyHpBar = document.getElementById('enemy-hp-bar');
-            enemyHpBar.style.width = enemyHpPercent + '%';
-            enemyHpBar.className = 'hp-fill ' + (enemyHpPercent > 50 ? 'high' : enemyHpPercent > 25 ? 'medium' : 'low');
+            document.getElementById('enemy-name').textContent = gameState.enemy.name + (gameState.enemy.level > 1 ? ' Lv.' + gameState.enemy.level : '');
+            document.getElementById('enemy-hp-text').textContent = Math.max(0, gameState.enemy.currentHp);
+            const enemyPct = (gameState.enemy.currentHp / gameState.enemy.maxHp) * 100;
+            document.getElementById('enemy-hp').style.width = enemyPct + '%';
 
-            // Turn indicator
-            const turnIndicator = document.getElementById('turn-indicator');
-            if (gameState.turn === 'player') {
-                turnIndicator.textContent = '⚔️ YOUR TURN ⚔️';
-                turnIndicator.className = 'turn-indicator player-turn';
-            } else {
-                turnIndicator.textContent = '⏳ ENEMY TURN ⏳';
-                turnIndicator.className = 'turn-indicator enemy-turn';
-            }
-
-            // Disable buttons on enemy turn
-            document.querySelectorAll('.action-btn').forEach(btn => {
-                btn.disabled = gameState.turn !== 'player';
-            });
-        }
-
-        function playerAction(action) {
-            if (gameState.turn !== 'player') return;
-
-            gameState.blocking = false;
-
-            switch(action) {
-                case 'attack':
-                    const damage = Math.max(1, gameState.player.atk - Math.floor(gameState.enemy.def / 2));
-                    gameState.enemy.currentHp -= damage;
-                    addLog(`You attacked for ${damage} damage!`, 'damage');
-                    showDamage(damage, 'enemy-card');
-                    break;
-
-                case 'heal':
-                    const healAmount = Math.floor(gameState.player.hp * 0.3);
-                    gameState.player.currentHp = Math.min(gameState.player.hp, gameState.player.currentHp + healAmount);
-                    addLog(`You healed for ${healAmount} HP!`, 'heal');
-                    break;
-
-                case 'special':
-                    const specialDamage = Math.floor(gameState.player.atk * 1.5);
-                    gameState.enemy.currentHp -= specialDamage;
-                    addLog(`${gameState.player.special} deals ${specialDamage} damage!`, 'special');
-                    showDamage(specialDamage, 'enemy-card');
-                    break;
-
-                case 'block':
-                    gameState.blocking = true;
-                    addLog('You raised your guard! (Damage reduced next turn)', 'block');
-                    break;
-            }
-
-            updateUI();
-
-            if (gameState.enemy.currentHp <= 0) {
-                setTimeout(() => winBattle(), 500);
-            } else {
-                gameState.turn = 'enemy';
-                updateUI();
-                setTimeout(() => enemyTurn(), 1000);
-            }
-        }
-
-        function enemyTurn() {
-            const actions = ['attack', 'attack', 'attack', 'heal', 'special'];
-            const action = actions[Math.floor(Math.random() * actions.length)];
-
-            switch(action) {
-                case 'attack':
-                    let damage = Math.max(1, gameState.enemy.atk - Math.floor(gameState.player.def / 2));
-                    if (gameState.blocking) {
-                        damage = Math.floor(damage / 2);
-                        addLog(`Enemy attacked but you blocked! Took ${damage} damage!`, 'damage');
-                    } else {
-                        addLog(`Enemy attacked for ${damage} damage!`, 'damage');
-                    }
-                    gameState.player.currentHp -= damage;
-                    showDamage(damage, 'player-card');
-                    break;
-
-                case 'heal':
-                    const healAmount = Math.floor(gameState.enemy.maxHp * 0.2);
-                    gameState.enemy.currentHp = Math.min(gameState.enemy.maxHp, gameState.enemy.currentHp + healAmount);
-                    addLog(`Enemy healed for ${healAmount} HP!`, 'heal');
-                    break;
-
-                case 'special':
-                    const specialDamage = Math.floor(gameState.enemy.atk * 1.3);
-                    let finalDamage = specialDamage;
-                    if (gameState.blocking) {
-                        finalDamage = Math.floor(finalDamage / 2);
-                        addLog(`Enemy used special attack but you blocked! Took ${finalDamage} damage!`, 'special');
-                    } else {
-                        addLog(`Enemy used a powerful attack for ${finalDamage} damage!`, 'special');
-                    }
-                    gameState.player.currentHp -= finalDamage;
-                    showDamage(finalDamage, 'player-card');
-                    break;
-            }
-
-            updateUI();
-
-            if (gameState.player.currentHp <= 0) {
-                setTimeout(() => gameOver(false), 500);
-            } else {
-                gameState.turn = 'player';
-                gameState.blocking = false;
-                updateUI();
-            }
-        }
-
-        function showDamage(amount, targetId) {
-            const target = document.getElementById(targetId);
-            const popup = document.createElement('div');
-            popup.className = 'damage-popup';
-            popup.textContent = '-' + amount;
-            popup.style.color = '#ff6b6b';
-            popup.style.left = '50%';
-            popup.style.top = '30%';
-            popup.style.transform = 'translateX(-50%)';
-            target.appendChild(popup);
-            setTimeout(() => popup.remove(), 1000);
-        }
-
-        function addLog(message, type = '') {
-            const logPanel = document.getElementById('battle-log');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry ' + type;
-            entry.textContent = '> ' + message;
-            logPanel.appendChild(entry);
-            logPanel.scrollTop = logPanel.scrollHeight;
+            // Stats
+            document.getElementById('streak').textContent = gameState.streak;
+            document.getElementById('combo-multiplier').textContent = gameState.combo;
         }
 
         function winBattle() {
-            gameState.playerWins++;
+            gameState.battleCount++;
             
-            // XP gain
-            const xpGain = 30 + (gameState.enemy.level * 10);
-            gameState.player.xp += xpGain;
-            addLog(`Victory! Gained ${xpGain} XP!`, 'special');
-
-            // Level up check
-            if (gameState.player.xp >= gameState.player.xpToNext) {
-                gameState.player.level++;
-                gameState.player.xp -= gameState.player.xpToNext;
-                gameState.player.xpToNext = Math.floor(gameState.player.xpToNext * 1.5);
-                gameState.player.hp += 10;
-                gameState.player.atk += 3;
-                gameState.player.def += 2;
-                gameState.player.currentHp = gameState.player.hp;
-                addLog(`LEVEL UP! You are now level ${gameState.player.level}!`, 'special');
+            if (gameState.battleCount >= 5) {
+                gameOver(true);
+            } else {
+                // Heal a bit
+                gameState.player.currentHp = Math.min(gameState.player.maxHp, gameState.player.currentHp + 20);
+                spawnEnemy();
+                updateUI();
+                nextQuestion();
             }
-
-            // Heal a bit after battle
-            gameState.player.currentHp = Math.min(gameState.player.hp, gameState.player.currentHp + 20);
-
-            setTimeout(() => {
-                gameState.battleCount++;
-                if (gameState.battleCount >= 5) {
-                    gameOver(true);
-                } else {
-                    spawnEnemy();
-                    addLog(`New battle! A ${gameState.enemy.name} appears!`, 'special');
-                    gameState.turn = 'player';
-                    updateUI();
-                }
-            }, 1500);
         }
 
         function gameOver(won) {
-            const gameOverScreen = document.getElementById('game-over');
-            const resultText = document.getElementById('game-result');
-            const rewardText = document.getElementById('game-reward');
-
-            gameOverScreen.classList.remove('hidden', 'win', 'lose');
-            gameOverScreen.classList.add(won ? 'win' : 'lose');
-
-            if (won) {
-                resultText.textContent = '🎉 VICTORY! 🎉';
-                rewardText.textContent = `You won ${gameState.playerWins} battles and reached level ${gameState.player.level}!`;
-            } else {
-                resultText.textContent = '💀 DEFEAT 💀';
-                rewardText.textContent = `You won ${gameState.playerWins} battles before falling.`;
-            }
+            document.getElementById('battle-screen').classList.add('hidden');
+            document.getElementById('game-over').classList.remove('hidden');
+            document.getElementById('game-over').className = 'game-over ' + (won ? 'win' : 'lose');
+            document.getElementById('result-text').textContent = won ? '🎉 VICTORY! 🎉' : '💀 DEFEAT 💀';
+            document.getElementById('result-stats').textContent = `Battles won: ${gameState.battleCount} | Best streak: ${gameState.streak}`;
         }
 
         function resetGame() {
             gameState = {
                 player: null,
                 enemy: null,
-                turn: 'player',
-                battleCount: 0,
-                playerWins: 0,
-                blocking: false
+                streak: 0,
+                combo: 1,
+                timer: null,
+                timeLeft: 10,
+                currentQuestion: null,
+                shield: false,
+                sword: false,
+                battleCount: 0
             };
             selectedMonster = null;
 
+            document.querySelectorAll('.power-up').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.monster-option').forEach(o => o.classList.remove('selected'));
+            
             document.getElementById('game-over').classList.add('hidden');
             document.getElementById('battle-screen').classList.add('hidden');
-            document.getElementById('selection-screen').classList.remove('hidden');
-            document.querySelectorAll('.monster-option').forEach(o => o.classList.remove('selected'));
-            document.getElementById('battle-log').innerHTML = '<div class="log-entry">Battle started! Choose your action!</div>';
+            document.getElementById('start-screen').classList.remove('hidden');
         }
     </script>
 </body>
