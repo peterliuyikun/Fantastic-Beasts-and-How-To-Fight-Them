@@ -337,6 +337,7 @@
             powerups: [],
             monsters: [],
             crystals_drops: [],
+            apples: [],
             projectiles: [],
             particles: [],
             keys: {},
@@ -364,38 +365,38 @@
             height: 500
         };
 
-        // Powerup definitions (30 total)
+        // Powerup definitions (30 total) - ALL have damage capabilities
         const POWERUPS = [
-            { id: 'sword', icon: '⚔️', name: 'Sword', desc: 'Melee damage +50%', type: 'passive', effect: { damage: 1.5 } },
-            { id: 'shield', icon: '🛡️', name: 'Shield', desc: 'Damage taken -30%', type: 'passive', effect: { defense: 0.7 } },
-            { id: 'boots', icon: '👢', name: 'Speed Boots', desc: 'Move speed +25%', type: 'passive', effect: { speed: 1.25 } },
-            { id: 'heart', icon: '❤️', name: 'Vitality', desc: 'Max HP +50', type: 'passive', effect: { hp: 50 } },
-            { id: 'fire', icon: '🔥', name: 'Fire Orb', desc: 'Ranged fire attack', type: 'active', damage: 25, cooldown: 60 },
-            { id: 'ice', icon: '❄️', name: 'Ice Shard', desc: 'Slows enemies', type: 'active', damage: 15, slow: 0.5, cooldown: 45 },
-            { id: 'lightning', icon: '⚡', name: 'Lightning', desc: 'Chain damage', type: 'active', damage: 35, chain: 3, cooldown: 90 },
-            { id: 'poison', icon: '☠️', name: 'Poison Dart', desc: 'Damage over time', type: 'active', damage: 10, dot: 5, duration: 60, cooldown: 40 },
-            { id: 'heal', icon: '💚', name: 'Heal Aura', desc: 'Passive HP regen', type: 'passive', effect: { regen: 1 } },
-            { id: 'vamp', icon: '🩸', name: 'Vampirism', desc: 'Life steal 20%', type: 'passive', effect: { lifesteal: 0.2 } },
-            { id: 'crit', icon: '🎯', name: 'Critical Eye', desc: '25% crit chance', type: 'passive', effect: { crit: 0.25, critMult: 2 } },
-            { id: 'multishot', icon: '🔫', name: 'Multishot', desc: '3 projectiles', type: 'passive', effect: { multishot: 3 } },
-            { id: 'pierce', icon: '➡️', name: 'Pierce', desc: 'Projectiles pierce', type: 'passive', effect: { pierce: true } },
-            { id: 'explosive', icon: '💥', name: 'Explosive', desc: 'AOE on hit', type: 'passive', effect: { explode: 30 } },
-            { id: 'homing', icon: '🧲', name: 'Homing', desc: 'Projectiles track', type: 'passive', effect: { homing: true } },
-            { id: 'aura', icon: '🔆', name: 'Damage Aura', desc: 'Damage nearby', type: 'passive', effect: { aura: 10, auraRange: 60 } },
-            { id: 'clone', icon: '👥', name: 'Clone', desc: 'Summon helper', type: 'active', cooldown: 300 },
-            { id: 'dash', icon: '💨', name: 'Dash', desc: 'Quick movement', type: 'active', cooldown: 60 },
-            { id: 'shield2', icon: '🛡️', name: 'Bubble Shield', desc: 'Temporary invincibility', type: 'active', duration: 120, cooldown: 300 },
-            { id: 'bomb', icon: '💣', name: 'Bomb', desc: 'Big AOE damage', type: 'active', damage: 100, cooldown: 180 },
-            { id: 'laser', icon: '🔴', name: 'Laser Beam', desc: 'Piercing beam', type: 'active', damage: 50, cooldown: 120 },
-            { id: 'spin', icon: '🌪️', name: 'Spin Attack', desc: '360 damage', type: 'active', damage: 40, cooldown: 90 },
-            { id: 'magnet', icon: '🧲', name: 'Crystal Magnet', desc: 'Auto collect crystals', type: 'passive', effect: { magnet: 100 } },
-            { id: 'lucky', icon: '🍀', name: 'Lucky', desc: 'More crystals', type: 'passive', effect: { crystalMult: 1.5 } },
-            { id: 'berserk', icon: '😤', name: 'Berserk', desc: 'Low HP = more damage', type: 'passive', effect: { berserk: true } },
-            { id: 'thorn', icon: '🌵', name: 'Thorns', desc: 'Reflect damage', type: 'passive', effect: { thorn: 0.3 } },
-            { id: 'freeze', icon: '🥶', name: 'Freeze', desc: 'Freeze all enemies', type: 'active', duration: 180, cooldown: 360 },
-            { id: 'meteor', icon: '☄️', name: 'Meteor', desc: 'Rain destruction', type: 'active', damage: 80, cooldown: 240 },
-            { id: 'drain', icon: '🌀', name: 'Life Drain', desc: 'AOE life steal', type: 'active', damage: 20, heal: 20, cooldown: 150 },
-            { id: 'time', icon: '⏱️', name: 'Time Warp', desc: 'Slow time', type: 'active', duration: 300, cooldown: 400 }
+            { id: 'sword', icon: '⚔️', name: 'Sword', desc: 'Melee damage +50%', type: 'passive', effect: { damage: 1.5 }, damage: 25 },
+            { id: 'shield', icon: '🛡️', name: 'Shield', desc: 'Damage taken -30%, +10 dmg', type: 'passive', effect: { defense: 0.7, damage: 1.1 }, damage: 10 },
+            { id: 'boots', icon: '👢', name: 'Speed Boots', desc: 'Move speed +25%, +8 dmg', type: 'passive', effect: { speed: 1.25, damage: 1.08 }, damage: 8 },
+            { id: 'heart', icon: '❤️', name: 'Vitality', desc: 'Max HP +50, +5 dmg', type: 'passive', effect: { hp: 50, damage: 1.05 }, damage: 5 },
+            { id: 'fire', icon: '🔥', name: 'Fire Orb', desc: 'Ranged fire attack', type: 'active', damage: 35, cooldown: 60 },
+            { id: 'ice', icon: '❄️', name: 'Ice Shard', desc: 'Slows enemies, +12 dmg', type: 'active', damage: 27, slow: 0.5, cooldown: 45 },
+            { id: 'lightning', icon: '⚡', name: 'Lightning', desc: 'Chain damage', type: 'active', damage: 45, chain: 3, cooldown: 90 },
+            { id: 'poison', icon: '☠️', name: 'Poison Dart', desc: 'Damage over time', type: 'active', damage: 15, dot: 5, duration: 60, cooldown: 40 },
+            { id: 'heal', icon: '💚', name: 'Heal Aura', desc: 'Passive HP regen, +6 dmg', type: 'passive', effect: { regen: 1, damage: 1.06 }, damage: 6 },
+            { id: 'vamp', icon: '🩸', name: 'Vampirism', desc: 'Life steal 20%, +12 dmg', type: 'passive', effect: { lifesteal: 0.2, damage: 1.12 }, damage: 12 },
+            { id: 'crit', icon: '🎯', name: 'Critical Eye', desc: '25% crit chance, +10 dmg', type: 'passive', effect: { crit: 0.25, critMult: 2, damage: 1.1 }, damage: 10 },
+            { id: 'multishot', icon: '🔫', name: 'Multishot', desc: '3 projectiles, +15 dmg', type: 'passive', effect: { multishot: 3, damage: 1.15 }, damage: 15 },
+            { id: 'pierce', icon: '➡️', name: 'Pierce', desc: 'Projectiles pierce, +18 dmg', type: 'passive', effect: { pierce: true, damage: 1.18 }, damage: 18 },
+            { id: 'explosive', icon: '💥', name: 'Explosive', desc: 'AOE on hit, +20 dmg', type: 'passive', effect: { explode: 30, damage: 1.2 }, damage: 20 },
+            { id: 'homing', icon: '🧲', name: 'Homing', desc: 'Projectiles track, +14 dmg', type: 'passive', effect: { homing: true, damage: 1.14 }, damage: 14 },
+            { id: 'aura', icon: '🔆', name: 'Damage Aura', desc: 'Damage nearby', type: 'passive', effect: { aura: 15, auraRange: 60, damage: 1.1 }, damage: 10 },
+            { id: 'clone', icon: '👥', name: 'Clone', desc: 'Summon helper, +22 dmg', type: 'active', damage: 22, cooldown: 300 },
+            { id: 'dash', icon: '💨', name: 'Dash', desc: 'Quick movement, +16 dmg', type: 'active', damage: 16, cooldown: 60 },
+            { id: 'shield2', icon: '🛡️', name: 'Bubble Shield', desc: 'Invincibility, +10 dmg', type: 'active', damage: 10, duration: 120, cooldown: 300 },
+            { id: 'bomb', icon: '💣', name: 'Bomb', desc: 'Big AOE damage', type: 'active', damage: 120, cooldown: 180 },
+            { id: 'laser', icon: '🔴', name: 'Laser Beam', desc: 'Piercing beam', type: 'active', damage: 65, cooldown: 120 },
+            { id: 'spin', icon: '🌪️', name: 'Spin Attack', desc: '360 damage', type: 'active', damage: 55, cooldown: 90 },
+            { id: 'magnet', icon: '🧲', name: 'Crystal Magnet', desc: 'Auto collect, +7 dmg', type: 'passive', effect: { magnet: 100, damage: 1.07 }, damage: 7 },
+            { id: 'lucky', icon: '🍀', name: 'Lucky', desc: 'More crystals, +9 dmg', type: 'passive', effect: { crystalMult: 1.5, damage: 1.09 }, damage: 9 },
+            { id: 'berserk', icon: '😤', name: 'Berserk', desc: 'Low HP = more damage', type: 'passive', effect: { berserk: true, damage: 1.2 }, damage: 20 },
+            { id: 'thorn', icon: '🌵', name: 'Thorns', desc: 'Reflect damage, +11 dmg', type: 'passive', effect: { thorn: 0.3, damage: 1.11 }, damage: 11 },
+            { id: 'freeze', icon: '🥶', name: 'Freeze', desc: 'Freeze all enemies, +30 dmg', type: 'active', damage: 30, duration: 180, cooldown: 360 },
+            { id: 'meteor', icon: '☄️', name: 'Meteor', desc: 'Rain destruction', type: 'active', damage: 100, cooldown: 240 },
+            { id: 'drain', icon: '🌀', name: 'Life Drain', desc: 'AOE life steal', type: 'active', damage: 30, heal: 30, cooldown: 150 },
+            { id: 'time', icon: '⏱️', name: 'Time Warp', desc: 'Slow time, +25 dmg', type: 'active', damage: 25, duration: 300, cooldown: 400 }
         ];
 
         // Monster types
@@ -442,6 +443,7 @@
                     <div class="icon">${p.icon}</div>
                     <div class="name">${p.name}</div>
                     <div class="desc">${p.desc}</div>
+                    <div style="color: #ff6b6b; font-size: 11px; margin-top: 5px;">⚔️ ${p.damage || 10} dmg</div>
                 `;
                 card.onclick = () => selectStartingPowerup(p, card);
                 grid.appendChild(card);
@@ -500,6 +502,7 @@
             game.xp = 0;
             game.monsters = [];
             game.crystals_drops = [];
+            game.apples = [];
             game.projectiles = [];
             game.particles = [];
             
@@ -771,6 +774,16 @@
                         life: 300
                     });
                     
+                    // Drop apple (30% chance, heals 25 HP)
+                    if (Math.random() < 0.3) {
+                        game.apples.push({
+                            x: m.x + (Math.random() - 0.5) * 20,
+                            y: m.y + (Math.random() - 0.5) * 20,
+                            heal: 25,
+                            life: 300
+                        });
+                    }
+                    
                     // XP
                     game.xp += m.xp;
                     if (game.xp >= game.xpToNext) {
@@ -815,6 +828,17 @@
                 }
                 c.life--;
                 if (c.life <= 0) game.crystals_drops.splice(i, 1);
+            });
+            
+            // Collect apples (healing items)
+            game.apples.forEach((a, i) => {
+                const dist = Math.hypot(a.x - player.x, a.y - player.y);
+                if (dist < player.radius + 15) {
+                    player.hp = Math.min(player.maxHp, player.hp + a.heal);
+                    game.apples.splice(i, 1);
+                }
+                a.life--;
+                if (a.life <= 0) game.apples.splice(i, 1);
             });
             
             // Update particles
@@ -892,6 +916,20 @@
                 ctx.fillText(c.amount, c.x, c.y + 15);
             });
             
+            // Draw apples (healing items)
+            game.apples.forEach(a => {
+                ctx.font = '22px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🍎', a.x, a.y);
+                // Pulse effect
+                const pulse = Math.sin(Date.now() / 200) * 3;
+                ctx.strokeStyle = '#ff6b6b';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(a.x, a.y - 5, 15 + pulse, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+            
             // Draw projectiles
             game.projectiles.forEach(p => {
                 ctx.font = '16px Arial';
@@ -952,14 +990,23 @@
             const grid = document.getElementById('upgradeGrid');
             grid.innerHTML = '';
             
-            game.powerups.forEach(p => {
+            // Show only 3 random powerups (or all if less than 3)
+            let powerupsToShow = game.powerups;
+            if (game.powerups.length > 3) {
+                powerupsToShow = [...game.powerups].sort(() => Math.random() - 0.5).slice(0, 3);
+            }
+            
+            powerupsToShow.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'upgrade-card';
+                const dmgBonus = p.damage ? `+${Math.floor(p.damage * (p.level + 1) * 0.5)} dmg` : '';
                 card.innerHTML = `
                     <div style="font-size: 36px; margin-bottom: 10px;">${p.icon}</div>
                     <div style="color: white; font-weight: bold;">${p.name}</div>
                     <div class="level">Level ${p.level} → ${p.level + 1}</div>
-                    <div style="color: #4ecdc4; margin-top: 10px;">Upgrade</div>
+                    <div style="color: #ff6b6b; font-size: 11px; margin-top: 5px;">⚔️ ${p.damage || 10} base dmg</div>
+                    ${dmgBonus ? `<div style="color: #4ecdc4; font-size: 10px;">${dmgBonus}</div>` : ''}
+                    <div style="color: #ffd700; margin-top: 10px;">Upgrade</div>
                 `;
                 card.onclick = () => upgradePowerup(p);
                 grid.appendChild(card);
@@ -999,6 +1046,7 @@
                     <div class="icon">${p.icon}</div>
                     <div class="name">${p.name}</div>
                     <div class="desc">${p.desc}</div>
+                    <div style="color: #ff6b6b; font-size: 11px; margin-top: 5px;">⚔️ ${p.damage || 10} dmg</div>
                 `;
                 card.onclick = () => selectNewPowerup(p);
                 grid.appendChild(card);
@@ -1025,7 +1073,8 @@
                 { name: 'Heal', icon: '💚', price: 50, action: () => { player.hp = player.maxHp; } },
                 { name: 'Max HP +20', icon: '❤️', price: 100, action: () => { player.maxHp += 20; player.hp += 20; } },
                 { name: 'Damage +10%', icon: '⚔️', price: 150, action: () => { /* Apply damage boost */ } },
-                { name: 'Speed +10%', icon: '👢', price: 120, action: () => { player.speed *= 1.1; } }
+                { name: 'Speed +10%', icon: '👢', price: 120, action: () => { player.speed *= 1.1; } },
+                { name: 'Apple +25 HP', icon: '🍎', price: 30, action: () => { player.hp = Math.min(player.maxHp, player.hp + 25); } }
             ];
             
             items.forEach(item => {
