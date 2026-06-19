@@ -275,7 +275,8 @@
         <!-- Start Menu -->
         <div class="menu" id="startMenu">
             <h1>👾 MONSTER BRAWL</h1>
-            <p style="color: #aaa; margin-bottom: 20px;">Survive 30 waves. Collect crystals. Buy powerups.</p>
+            <p style="color: #aaa; margin-bottom: 10px;">Survive 30 waves. Collect crystals. Buy powerups.</p>
+            <p style="color: #4ecdc4; font-size: 14px; margin-bottom: 20px;">🖱️ Move mouse to aim | Auto-shoot enabled!</p>
             <button class="btn" onclick="showPowerupSelect()">START GAME</button>
         </div>
 
@@ -596,6 +597,9 @@
 
         function update() {
             if (!game.running || game.paused) return;
+            
+            // Auto-shoot - attack continuously while game is running
+            playerAttack();
             
             // Player movement
             let dx = 0, dy = 0;
